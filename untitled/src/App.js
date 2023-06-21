@@ -47,15 +47,27 @@ const tempWatchedData = [
     },
 ];
 
-
-function NavBar({movies}) {
-    const [query, setQuery] = useState("");
-
-    return (<nav className="nav-bar">
+function Logo() {
+    return (
         <div className="logo">
             <span role="img">🍿</span>
             <h1>usePopcorn</h1>
         </div>
+    );
+}
+
+function NumResults({num}) {
+    return (
+        <p className="num-results">
+            Found <strong>{num}</strong> results
+        </p>
+    );
+}
+
+function Search() {
+    const [query, setQuery] = useState("");
+
+    return (
         <input
             className="search"
             type="text"
@@ -63,10 +75,18 @@ function NavBar({movies}) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
         />
-        <p className="num-results">
-            Found <strong>{movies.length}</strong> results
-        </p>
-    </nav>);
+    );
+}
+
+
+function NavBar({movies}) {
+    return (
+        <nav className="nav-bar">
+            <Logo/>
+            <Search/>
+            <NumResults num={movies.length}/>
+        </nav>
+    );
 }
 
 function BoxToggle({onClickBoxToggle, toggleIcon}) {
