@@ -76,7 +76,7 @@ function MovieList({movies}) {
     );
 }
 
-function Box({element}) {
+function Box({children}) {
     const [isOpen, setIsOpen] = useState(true);
 
     return (
@@ -85,7 +85,7 @@ function Box({element}) {
                     onClick={() => setIsOpen((open) => !open)}>
                 {isOpen ? "-" : "+"}
             </button>
-            {isOpen && element}
+            {isOpen && children}
         </div>
     )
 }
@@ -203,7 +203,7 @@ export default function App() {
     const [watched, setWatched] = useState(tempWatchedData);
 
     // compnent composition으로 props drilling 해소 & 컴포넌트끼리의 결합력 줄여서 재사용성 높임
-    // 한눈에 ui구조 볼 수 있는 좋은 레이아웃.
+    // 한눈에 UI 전체 구조 볼 수 있는 좋은 레이아웃.
     return (
         <>
             <NavBar>
@@ -212,13 +212,13 @@ export default function App() {
                 <NumResults num={movies.length}/>
             </NavBar>
             <Main>
-                <Box element={<MovieList movies={movies}/>}/>
-                <Box element={
-                    <>
-                        <WatchedSummary watched={watched}/>
-                        <WatchedMovieList watched={watched}/>
-                    </>
-                }/>
+                <Box>
+                    <MovieList movies={movies}/>
+                </Box>
+                <Box>
+                    <WatchedSummary watched={watched}/>
+                    <WatchedMovieList watched={watched}/>
+                </Box>
             </Main>
         </>
     );
