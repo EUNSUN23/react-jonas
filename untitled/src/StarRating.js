@@ -1,4 +1,5 @@
 import {useState} from "react";
+import PropTypes from 'prop-types';
 
 const containerStyle = {
     display: 'flex',
@@ -10,6 +11,16 @@ const starContainerStyle = {
     display: 'flex'
 }
 
+// property name은 소문자로 시작.
+StarRating.propTypes = {
+    // maxRating: PropTypes.number.isRequired, // maxRating prop을 숫자타입아닌 다른 타입으로 넣거나 안 넣으면(default값 없이) warning메세지.
+    maxRating: PropTypes.number,
+    defaultRating: PropTypes.number,
+    color: PropTypes.string,
+    size: PropTypes.number,
+    message: PropTypes.array,
+    onSetRating: PropTypes.func
+}
 
 export default function StarRating({
                                        maxRating = 5
