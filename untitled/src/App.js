@@ -51,9 +51,6 @@ const average = (arr) =>
     arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 
-
-
-
 function Movie({movie}) {
     return (
         <li>
@@ -79,16 +76,16 @@ function MovieList({movies}) {
     );
 }
 
-function ListBox({children}) {
-    const [isOpen1, setIsOpen1] = useState(true);
+function Box({children}) {
+    const [isOpen, setIsOpen] = useState(true);
 
     return (
         <div className="box">
             <button className="btn-toggle"
-                    onClick={() => setIsOpen1((open) => !open)}>
-                {isOpen1 ? "-":"+"}
+                    onClick={() => setIsOpen((open) => !open)}>
+                {isOpen ? "-" : "+"}
             </button>
-            {isOpen1 && children}
+            {isOpen && children}
         </div>
     )
 }
@@ -99,7 +96,7 @@ function WatchedSummary({watched}) {
     const avgUserRating = average(watched.map((movie) => movie.userRating));
     const avgRuntime = average(watched.map((movie) => movie.runtime));
 
-    return(
+    return (
         <div className="summary">
             <h2>Movies you watched</h2>
             <div>
@@ -121,7 +118,7 @@ function WatchedSummary({watched}) {
 }
 
 function WatchedMovie({movie}) {
-    return(
+    return (
         <li>
             <img src={movie.Poster} alt={`${movie.Title} poster`}/>
             <h3>{movie.Title}</h3>
@@ -144,33 +141,13 @@ function WatchedMovie({movie}) {
 }
 
 function WatchedMovieList({watched}) {
-    return(
+    return (
         <ul className="list">
-            {watched.map(movie=>(
+            {watched.map(movie => (
                 <WatchedMovie movie={movie} key={movie.imdbID}/>
             ))}
         </ul>
     )
-}
-
-function WatchedBox() {
-    const [watched, setWatched] = useState(tempWatchedData);
-    const [isOpen2, setIsOpen2] = useState(true);
-
-    return (
-        <div className="box">
-            <button className="btn-toggle" onClick={() => setIsOpen2(open => !open)}>
-                {isOpen2 ? "-":"+"}
-            </button>
-            {isOpen2 && (
-                <>
-                    <WatchedSummary watched={watched}/>
-                    <WatchedMovieList watched={watched}/>
-                </>
-            )}
-        </div>
-    );
-
 }
 
 function Main({children}) {
@@ -180,6 +157,7 @@ function Main({children}) {
         </main>
     )
 }
+
 function Logo() {
     return (
         <div className="logo">
@@ -224,6 +202,8 @@ export default function App() {
     const [movies, setMovies] = useState(tempMovieData);
     const [watched, setWatched] = useState(tempWatchedData);
 
+    // compnent composition으로 props drilling 해소 & 컴포넌트끼리의 결합력 줄여서 재사용성 높임
+    // 한눈에 ui구조 볼 수 있는 좋은 레이아웃.
     return (
         <>
             <NavBar>
@@ -232,10 +212,13 @@ export default function App() {
                 <NumResults num={movies.length}/>
             </NavBar>
             <Main>
-                <ListBox>
+                <Box>
                     <MovieList movies={movies}/>
-                </ListBox>
-                <WatchedBox/>
+                </Box>
+                <Box>
+                    <WatchedSummary watched={watched}/>
+                    <WatchedMovieList watched={watched}/>
+                </Box>
             </Main>
         </>
     );
