@@ -51,7 +51,7 @@ function Tabbed({ content }) {
             </div>
 
             {activeTab <= 2 ? (
-                <TabContent item={content.at(activeTab)} />
+                <TabContent item={content.at(activeTab)} key={content.at(activeTab).summary}/> // changing key prop줘서 매 렌더링마다 새로운 인스턴스로 대체되도록 -> state초기화 되도록
             ) : (
                 <DifferentContent />
             )}
