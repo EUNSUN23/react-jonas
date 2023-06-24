@@ -25,6 +25,18 @@ export default function App() {
         </div>
     );
 }
+// diffing rule - Fiber Tree와 새 React element tree(가상돔)을 비교해서 Fiber Tree를 업데이트 할 때 적용되는 룰
+// 1. 다른 종류의 element는 각각 다른 tree가 된다
+// ex)
+// <div>
+//  <SearchBar/>
+// </div>
+//
+//  ==>
+//
+//  <header>
+//   <SearchBar/>
+//  </header>
 
 function Tabbed({ content }) {
     const [activeTab, setActiveTab] = useState(0);
