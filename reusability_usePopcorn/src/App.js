@@ -94,6 +94,7 @@ function Box({children}) {
 
 function MovieDetails({selectedId, onCloseMovie}) {
     const [movie, setMovie] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
 
     const {
         Title: title,
@@ -110,37 +111,44 @@ function MovieDetails({selectedId, onCloseMovie}) {
 
     useEffect(function () {
         async function getMovieDetails() {
-            try {
-                const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`);
-                const data = await res.json();
-                setMovie(data);
-            } catch (e) {
-            } finally {
-            }
+            setIsLoading(true);
+            const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`);
+            const data = await res.json();
+            setMovie(data);
+            setIsLoading(false);
         }
         getMovieDetails();
-    }, []);
+    }, [selectedId]);
+    // App에서 selectedId초기화시켜서 아예 인스턴스가 트리구조상에서 제거되지 않는 이상, 이 인스턴스는 재렌더링시에도 재생성 되지 않는다. 즉, 마운트를 더이상 겪지 않는다.
+    // --> dependency array를 빈배열로 남겨두면 재렌더링이 일어나서 다른 selectedId를 넘겨받아도 이펙트 실행(데이터 fetch)을 하지 않는다.
+    // --> 따라서 selectedId 변화에 따라서 이펙트 실행되도록 dependency array에 selectedId 추가.
+
+
     return (
         <div className="details">
-            <header>
-                <button className="btn-back" onClick={onCloseMovie}>&larr;</button>
-                {selectedId}
-                <img src={poster} alt={`Poster of ${movie} movie`}/>
-                <div className="details-overview">
-                    <h2>{title}</h2>
-                    <p>{released} &bull; {runtime}</p>
-                    <p>{genre}</p>
-                    <p><span>⭐</span>{imdbRating}IMDB rating</p>
-                </div>
-            </header>
-            <section>
-                <div className="rating">
-                    <StarRating maxRating={10} size={24}/>
-                </div>
-                <p><em>{plot}</em></p>
-                <p>Starring {actors}</p>
-                <p>Directed by {director}</p>
-            </section>
+            {isLoading ? <Loader/> : (
+                <>
+                    <header>
+                        <button className="btn-back" onClick={onCloseMovie}>&larr;</button>
+                        {selectedId}
+                        <img src={poster} alt={`Poster of ${movie} movie`}/>
+                        <div className="details-overview">
+                            <h2>{title}</h2>
+                            <p>{released} &bull; {runtime}</p>
+                            <p>{genre}</p>
+                            <p><span>⭐</span>{imdbRating}IMDB rating</p>
+                        </div>
+                    </header>
+                    <section>
+                        <div className="rating">
+                            <StarRating maxRating={10} size={24}/>
+                        </div>
+                        <p><em>{plot}</em></p>
+                        <p>Starring {actors}</p>
+                        <p>Directed by {director}</p>
+                    </section>
+                </>
+            )}
         </div>
     )
 }
