@@ -176,9 +176,7 @@ function NumResults({num}) {
     );
 }
 
-function Search() {
-    const [query, setQuery] = useState("");
-
+function Search({query, setQuery}) {
     return (
         <input
             className="search"
@@ -200,32 +198,36 @@ function NavBar({children}) {
 }
 
 const KEY = '151bf98b';
-// const query = "interstellar";
-const query = "adfsdsaf";
+// const query = "adfsdsaf";
 
 // ** useEffect - 렌더링 로직에 포함되면 안되는 사이드 이펙트들을 처리한다.
 export default function App() {
     const [movies, setMovies] = useState([]);
     const [watched, setWatched] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState('')
+    const [error, setError] = useState("");
+    const [query, setQuery] = useState("");
+    const [selectedId, setSelectedId] = useState(null);
 
-    // * render logic이 pure해야하는 이유 - 렌더링 중에 state를 업데이트 하면 재렌더링이 무한반복되기때문에.*
-    // fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=interstellar`).then(res => res.json()).then(data => setMovies(data.Search));
-
-    // 컴포넌트 인스턴스가 첫 mount 되어서 화면에 렌더링 된 후 실행 (최초 1회)
     // useEffect(function () {
-    //     fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=interstellar`)
-    //         .then(res => res.json())
-    //         .then(data => setMovies(data.Search));
+    //     console.log("After initial render");
     // },[]);
+    //
+    // useEffect(function () {
+    //     console.log("After every render");
+    // });
+    //
+    // useEffect(function () {
+    //     console.log("D")
+    // },[query]);
+    //
+    // console.log("During render");
 
-    // useEffect의 콜백함수는 항상 동기(synchronous)여야 한다. -> 콜백함수에 asyn키워드 x
-    // React 18 ~ 부터는 개발모드에서는 effect를 한번 더 실행한다.
     useEffect(function () {
         async function fetchMovies() {
             try {
                 setIsLoading(true);
+                setError("");
                 const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`);
 
                 if (!res.ok) throw new Error("Sth went wrong with fetching movies");
@@ -234,31 +236,33 @@ export default function App() {
                 if(data.Response === "False") throw new Error("Movie not Found");
 
                 setMovies(data.Search);
-                console.log(data.Search);
             } catch (e) {
                 setError(e.message);
             }finally{
                 setIsLoading(false);
             }
-
         }
-
+        if(query.length < 3) {
+            setMovies([]);
+            setError("");
+            return;
+        }
         fetchMovies();
-    }, []);
+    }, [query]);
 
 
     return (
         <>
             <NavBar>
                 <Logo/>
-                <Search/>
+                <Search query={query} setQuery={setQuery}/>
                 <NumResults num={movies.length}/>
             </NavBar>
             <Main>
                 <Box>
                     {/*{isLoading ? <Loader/> : <MovieList movies={movies}/>}*/}
                     {isLoading && <Loader/>}
-                    {isLoading && !error && <MovieList movies={movies}/>}
+                    {!isLoading && !error && <MovieList movies={movies}/>}
                     {error && <ErrorMessage message={error}/>}
                 </Box>
                 <Box>
