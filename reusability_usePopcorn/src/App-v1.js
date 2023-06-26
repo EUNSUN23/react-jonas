@@ -1,6 +1,5 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 
-// 151bf98b
 const tempMovieData = [
     {
         imdbID: "tt1375666",
@@ -199,54 +198,12 @@ function NavBar({children}) {
     );
 }
 
-const KEY = '151bf98b';
-// const query = "interstellar";
-const query = "adfsdsaf";
-
-// ** useEffect - 렌더링 로직에 포함되면 안되는 사이드 이펙트들을 처리한다.
 export default function App() {
-    const [movies, setMovies] = useState([]);
-    const [watched, setWatched] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState('')
+    const [movies, setMovies] = useState(tempMovieData);
+    const [watched, setWatched] = useState(tempWatchedData);
 
-    // * render logic이 pure해야하는 이유 - 렌더링 중에 state를 업데이트 하면 재렌더링이 무한반복되기때문에.*
-    // fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=interstellar`).then(res => res.json()).then(data => setMovies(data.Search));
-
-    // 컴포넌트 인스턴스가 첫 mount 되어서 화면에 렌더링 된 후 실행 (최초 1회)
-    // useEffect(function () {
-    //     fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=interstellar`)
-    //         .then(res => res.json())
-    //         .then(data => setMovies(data.Search));
-    // },[]);
-
-    // useEffect의 콜백함수는 항상 동기(synchronous)여야 한다. -> 콜백함수에 asyn키워드 x
-    // React 18 ~ 부터는 개발모드에서는 effect를 한번 더 실행한다.
-    useEffect(function () {
-        async function fetchMovies() {
-            try {
-                setIsLoading(true);
-                const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`);
-
-                if (!res.ok) throw new Error("Sth went wrong with fetching movies");
-
-                const data = await res.json();
-                if(data.Response === "False") throw new Error("Movie not Found");
-
-                setMovies(data.Search);
-                console.log(data.Search);
-            } catch (e) {
-                setError(e.message);
-            }finally{
-                setIsLoading(false);
-            }
-
-        }
-
-        fetchMovies();
-    }, []);
-
-
+    // compnent composition으로 props drilling 해소 & 컴포넌트끼리의 결합력 줄여서 재사용성 높임
+    // 한눈에 UI 전체 구조 볼 수 있는 좋은 레이아웃.
     return (
         <>
             <NavBar>
@@ -256,10 +213,7 @@ export default function App() {
             </NavBar>
             <Main>
                 <Box>
-                    {/*{isLoading ? <Loader/> : <MovieList movies={movies}/>}*/}
-                    {isLoading && <Loader/>}
-                    {isLoading && !error && <MovieList movies={movies}/>}
-                    {error && <ErrorMessage message={error}/>}
+                    <MovieList movies={movies}/>
                 </Box>
                 <Box>
                     <WatchedSummary watched={watched}/>
@@ -268,12 +222,4 @@ export default function App() {
             </Main>
         </>
     );
-}
-
-function Loader() {
-    return (<p className="loader">Loading...</p>)
-}
-
-function ErrorMessage({message}) {
-    return (<p className="error"><span>⛔</span> {message}</p>)
 }
