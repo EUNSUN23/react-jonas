@@ -139,6 +139,17 @@ function MovieDetails({selectedId, onCloseMovie, onAddWatched, watched}) {
     // --> dependency array를 빈배열로 남겨두면 재렌더링이 일어나서 다른 selectedId를 넘겨받아도 이펙트 실행(데이터 fetch)을 하지 않는다.
     // --> 따라서 selectedId 변화에 따라서 이펙트 실행되도록 dependency array에 selectedId 추가.
 
+    // 페이지 title 바꾸기 - 애플리케이션 바깥의 element 바꾸는 것이므로 사이드이펙트라서 useEffect 안에서 처리.
+    useEffect(function () {
+        if(!title) return;
+        document.title = `Movie | ${title}`;
+
+        return function () {
+            document.title = "usePopcorn";
+            console.log(`Clean up effect for movie ${title}`); // 컴포넌트가 unmount된 후 실행됨에도 불구하고, closure함수라서 title을 기억하고 있다.
+        };
+    },[title]);
+
     const isWatched = watched.find(movie => movie.imdbId === selectedId);
 
     return (
