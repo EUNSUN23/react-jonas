@@ -92,9 +92,10 @@ function Box({children}) {
     )
 }
 
-function MovieDetails({selectedId, onCloseMovie}) {
+function MovieDetails({selectedId, onCloseMovie, onAddWatched, watched}) {
     const [movie, setMovie] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+    const [userRating, setUserRating] = useState("");
 
     const {
         Title: title,
@@ -109,6 +110,20 @@ function MovieDetails({selectedId, onCloseMovie}) {
         Genre: genre
     } = movie;
 
+    function handleAdd() {
+        const newWatchedMovie = {
+            imdbId: selectedId,
+            title,
+            year,
+            poster,
+            imdbRating: Number(imdbRating),
+            runtime: runtime.split(" ").at(0),
+            userRating
+        }
+        onAddWatched(newWatchedMovie);
+        onCloseMovie();
+    }
+
     useEffect(function () {
         async function getMovieDetails() {
             setIsLoading(true);
@@ -117,12 +132,14 @@ function MovieDetails({selectedId, onCloseMovie}) {
             setMovie(data);
             setIsLoading(false);
         }
+
         getMovieDetails();
     }, [selectedId]);
     // App에서 selectedId초기화시켜서 아예 인스턴스가 트리구조상에서 제거되지 않는 이상, 이 인스턴스는 재렌더링시에도 재생성 되지 않는다. 즉, 마운트를 더이상 겪지 않는다.
     // --> dependency array를 빈배열로 남겨두면 재렌더링이 일어나서 다른 selectedId를 넘겨받아도 이펙트 실행(데이터 fetch)을 하지 않는다.
     // --> 따라서 selectedId 변화에 따라서 이펙트 실행되도록 dependency array에 selectedId 추가.
 
+    const isWatched = watched.find(movie => movie.imdbId === selectedId);
 
     return (
         <div className="details">
@@ -140,9 +157,17 @@ function MovieDetails({selectedId, onCloseMovie}) {
                         </div>
                     </header>
                     <section>
+
                         <div className="rating">
-                            <StarRating maxRating={10} size={24}/>
+                            {!isWatched ?
+                                <>
+                                    <StarRating maxRating={10} size={24} onSetRating={setUserRating}/>
+                                    {userRating > 0 && (
+                                        <button className="btn-add" onClick={handleAdd}>+ Add to list</button>)}
+                                </>
+                                : <p>You rated this movie with {watched.find(movie => movie.imdbId === selectedId)?.userRating} <span>🌟</span></p>}
                         </div>
+
                         <p><em>{plot}</em></p>
                         <p>Starring {actors}</p>
                         <p>Directed by {director}</p>
@@ -169,7 +194,11 @@ function WatchedSummary({watched}) {
                 </p>
                 <p>
                     <span>⭐</span>
-                    <span>{avgImdbRating}</span>
+                    <span>{avgImdbRating.toFixed(2)}</span>
+                </p>
+                <p>
+                    <span>🌟</span>
+                    <span>{avgUserRating.toFixed(2)}</span>
                 </p>
                 <p>
                     <span>🕐</span>
@@ -180,11 +209,11 @@ function WatchedSummary({watched}) {
     )
 }
 
-function WatchedMovie({movie}) {
+function WatchedMovie({movie, onDeleteWatched}) {
     return (
         <li>
-            <img src={movie.Poster} alt={`${movie.Title} poster`}/>
-            <h3>{movie.Title}</h3>
+            <img src={movie.poster} alt={`${movie.title} poster`}/>
+            <h3>{movie.title}</h3>
             <div>
                 <p>
                     <span>⭐</span>
@@ -198,16 +227,18 @@ function WatchedMovie({movie}) {
                     <span>🕐</span>
                     <span>{movie.runtime} min</span>
                 </p>
+
+                <button className="btn-delete" onClick={() => onDeleteWatched(movie.imdbId)}>X</button>
             </div>
         </li>
     )
 }
 
-function WatchedMovieList({watched}) {
+function WatchedMovieList({watched, onDeleteWatched}) {
     return (
         <ul className="list">
             {watched.map(movie => (
-                <WatchedMovie movie={movie} key={movie.imdbID}/>
+                <WatchedMovie movie={movie} key={movie.imdbID} onDeleteWatched={onDeleteWatched}/>
             ))}
         </ul>
     )
@@ -279,6 +310,14 @@ export default function App() {
         setSelectedId(null);
     }
 
+    function handleAddWatchedMovie(movie) {
+        setWatched(watched => [...watched, movie]);
+    }
+
+    function handleDeleteWatchedMovie(id) {
+        setWatched(watched => watched.filter(movie => movie.imdbId !== id))
+    }
+
     useEffect(function () {
         async function fetchMovies() {
             try {
@@ -323,10 +362,14 @@ export default function App() {
                     {error && <ErrorMessage message={error}/>}
                 </Box>
                 <Box>
-                    {selectedId ? <MovieDetails selectedId={selectedId} onCloseMovie={handleCloseMovie}/> :
+                    {selectedId ? <MovieDetails selectedId={selectedId}
+                                                onCloseMovie={handleCloseMovie}
+                                                onAddWatched={handleAddWatchedMovie}
+                                                watched={watched}
+                        /> :
                         (<>
                             <WatchedSummary watched={watched}/>
-                            <WatchedMovieList watched={watched}/>
+                            <WatchedMovieList watched={watched} onDeleteWatched={handleDeleteWatchedMovie}/>
                         </>)
                     }
                 </Box>
