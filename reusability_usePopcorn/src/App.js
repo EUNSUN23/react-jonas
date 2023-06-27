@@ -125,6 +125,20 @@ function MovieDetails({selectedId, onCloseMovie, onAddWatched, watched}) {
     }
 
     useEffect(function () {
+        function callback(event) {
+            if (event.code === "Escape") {
+                onCloseMovie();
+            }
+        }
+
+        document.addEventListener('keydown', callback); // MovieDetails인스턴스가 mount될때마다 이벤트리스너가 누적되어서 등록된다.--> cleanup 필요
+
+        return function () {
+            document.removeEventListener('keydown', callback);
+        };
+    },[onCloseMovie]);
+
+    useEffect(function () {
         async function getMovieDetails() {
             setIsLoading(true);
             const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`);
@@ -146,7 +160,7 @@ function MovieDetails({selectedId, onCloseMovie, onAddWatched, watched}) {
 
         return function () {
             document.title = "usePopcorn";
-            console.log(`Clean up effect for movie ${title}`); // 컴포넌트가 unmount된 후 실행됨에도 불구하고, closure함수라서 title을 기억하고 있다.
+            // console.log(`Clean up effect for movie ${title}`); // 컴포넌트가 unmount된 후 실행됨에도 불구하고, closure함수라서 title을 기억하고 있다.
         };
     },[title]);
 
@@ -356,6 +370,7 @@ export default function App() {
             setError("");
             return;
         }
+        handleCloseMovie();
         fetchMovies();
 
         return function () { // query가 바뀌어서 다음 실행이 이뤄지기 직전에 실행된다.
