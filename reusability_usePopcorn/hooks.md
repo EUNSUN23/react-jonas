@@ -35,14 +35,19 @@ useEffect(fnz, []);
 
 👉 **state update**
 
-✅ 반드시 이전 객체를 참조하지 않는 새 객체로 update해야한다. 
-
-- 단순 update
-- 최신 값을 기반으로 업데이트
-
-   ```js
-   function handleAddWatchedMovie(movie) {
-        setWatched(watched => [...watched, movie]);
-    }
-   ```
-
+- 반드시 이전 객체를 참조하지 않는 새 객체로 update해야한다.
+- **한 실행컨텍스트 내의 여러 state update는 스케쥴링에 의해 batching(일괄처리) 된다.**
+  
+  ```js
+  function handleTripleInc() {
+       // state-batching으로 인해 아래의 likes는 모두 동일한 값이다.
+       // setLikes(likes + 1);
+       // setLikes(likes + 1);
+       // setLikes(likes + 1);
+  
+       // 최신(현재) state를 기반으로 setState
+       setLikes(likes => likes + 1);
+       setLikes(likes => likes + 1);
+       setLikes(likes => likes + 1);
+   }
+  ```
