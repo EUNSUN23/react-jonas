@@ -1,6 +1,10 @@
 import {useEffect, useRef, useState} from "react";
 import StarRating from "./StarRating";
+import {useMovies} from "./useMovies";
+import {useLocalStorageState} from "./useLocalStorageState";
+import {useKey} from "./useKey";
 
+const KEY = '151bf98b';
 // 151bf98b
 const tempMovieData = [
     {
@@ -97,12 +101,13 @@ function MovieDetails({selectedId, onCloseMovie, onAddWatched, watched}) {
     const [isLoading, setIsLoading] = useState(false);
     const [userRating, setUserRating] = useState("");
 
+
     const countRef = useRef(0);
 
     // 유저가 평점 매길때마다 count
     useEffect(function () {
-        if(userRating) countRef.current = countRef.current + 1;
-    },[userRating]);
+        if (userRating) countRef.current = countRef.current + 1;
+    }, [userRating]);
 
     const {
         Title: title,
@@ -126,25 +131,13 @@ function MovieDetails({selectedId, onCloseMovie, onAddWatched, watched}) {
             imdbRating: Number(imdbRating),
             runtime: runtime.split(" ").at(0),
             userRating,
-            countRatingDecisions:countRef.current
+            countRatingDecisions: countRef.current
         }
         onAddWatched(newWatchedMovie);
         onCloseMovie();
     }
 
-    useEffect(function () {
-        function callback(event) {
-            if (event.code === "Escape") {
-                onCloseMovie();
-            }
-        }
-
-        document.addEventListener('keydown', callback); // MovieDetails인스턴스가 mount될때마다 이벤트리스너가 누적되어서 등록된다.--> cleanup 필요
-
-        return function () {
-            document.removeEventListener('keydown', callback);
-        };
-    }, [onCloseMovie]);
+    useKey("Escape", onCloseMovie);
 
     useEffect(function () {
         async function getMovieDetails() {
@@ -307,29 +300,11 @@ function NumResults({num}) {
 function Search({query, setQuery}) {
     const inputEl = useRef(null); // 초기값 - null
 
-    // * useEffect 안에서 inputEl 사용하는 이유 *
-    // inputEl은 DOM painting이 일어날 때 ref 어트리뷰트(?)로 연결된 HTML요소와 바인딩 된다.
-    // -> DOM painting이 완료되고 나서야 inputEl의 current에 바인딩된 html요소를 사용할 수 있다.
-    useEffect(function () {
-        function callback(e) {
-            if(document.activeElement === inputEl.current) return;  // 이미 focus된 상태면 return
-            if(e.code === "Enter"){
-                inputEl.current.focus();
-                setQuery("");
-            }
-        }
-
-        document.addEventListener('keydown',callback);
-        return () => document.removeEventListener('keydown', callback);
-
-    }, [setQuery]);
-
-    // 돔을 직접 조작하는 건 React 방식이 아님
-    // dependency에 따라서는 매 렌더링마다 html요소 선택해야함
-    // useEffect(function () {
-    //    const el = document.querySelector('.search');
-    //    el.focus();
-    // },[]);
+    useKey("Enter", function () {
+        if (document.activeElement === inputEl.current) return;  // 이미 focus된 상태면 return
+            inputEl.current.focus();
+            setQuery("");
+    });
 
     return (
         <input
@@ -352,24 +327,12 @@ function NavBar({children}) {
     );
 }
 
-const KEY = '151bf98b';
-// const query = "adfsdsaf";
 
-// ** useEffect - 렌더링 로직에 포함되면 안되는 사이드 이펙트들을 처리한다.
 export default function App() {
-    const [movies, setMovies] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState("");
     const [query, setQuery] = useState("");
     const [selectedId, setSelectedId] = useState(null);
-    // const [watched, setWatched] = useState([]);
-
-    // ** useState가 인자로 받는 callback의 return값으로 초기값 세팅
-    // - callback은 순수함수여야 하고, 인자를 받을 수 없다.
-    const [watched, setWatched] = useState(function () {
-        const storedValue = localStorage.getItem("watched");
-        return JSON.parse(storedValue);
-    });
+    const {movies, isLoading, error} = useMovies(query);
+    const [watched, setWatched] = useLocalStorageState([], "watched");
 
     function handleSelectMovie(id) {
         setSelectedId(selectedId => selectedId === id ? null : id);
@@ -386,45 +349,6 @@ export default function App() {
     function handleDeleteWatchedMovie(id) {
         setWatched(watched => watched.filter(movie => movie.imdbId !== id))
     }
-
-    useEffect(function () {
-        localStorage.setItem('watched', JSON.stringify(watched));
-    }, [watched]);
-
-    useEffect(function () {
-        const controller = new AbortController(); // WEB API. 리액트와 상관없음.
-        async function fetchMovies() {
-            try {
-                setIsLoading(true);
-                setError("");
-                const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`, {signal: controller.signal});
-
-                if (!res.ok) throw new Error("Sth went wrong with fetching movies");
-
-                const data = await res.json();
-                if (data.Response === "False") throw new Error("Movie not Found");
-
-                setMovies(data.Search);
-            } catch (e) {
-                // fetch취소 에러는 에러로 출력하지 않도록.
-                if (e.name !== "AbortError") setError(e.message);
-            } finally {
-                setIsLoading(false);
-            }
-        }
-
-        if (query.length < 3) {
-            setMovies([]);
-            setError("");
-            return;
-        }
-        handleCloseMovie();
-        fetchMovies();
-
-        return function () { // query가 바뀌어서 다음 실행이 이뤄지기 직전에 실행된다.
-            controller.abort(); // 현재 fetch를 취소한다. --> 결국에는 query가 더 이상 바뀌지 않을때까지 일어나는 모든 fetch 취소시킴.
-        };
-    }, [query]);
 
 
     return (
