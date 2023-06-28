@@ -136,7 +136,7 @@ function MovieDetails({selectedId, onCloseMovie, onAddWatched, watched}) {
         return function () {
             document.removeEventListener('keydown', callback);
         };
-    },[onCloseMovie]);
+    }, [onCloseMovie]);
 
     useEffect(function () {
         async function getMovieDetails() {
@@ -155,14 +155,14 @@ function MovieDetails({selectedId, onCloseMovie, onAddWatched, watched}) {
 
     // 페이지 title 바꾸기 - 애플리케이션 바깥의 element 바꾸는 것이므로 사이드이펙트라서 useEffect 안에서 처리.
     useEffect(function () {
-        if(!title) return;
+        if (!title) return;
         document.title = `Movie | ${title}`;
 
         return function () {
             document.title = "usePopcorn";
             // console.log(`Clean up effect for movie ${title}`); // 컴포넌트가 unmount된 후 실행됨에도 불구하고, closure함수라서 title을 기억하고 있다.
         };
-    },[title]);
+    }, [title]);
 
     const isWatched = watched.find(movie => movie.imdbId === selectedId);
 
@@ -190,7 +190,9 @@ function MovieDetails({selectedId, onCloseMovie, onAddWatched, watched}) {
                                     {userRating > 0 && (
                                         <button className="btn-add" onClick={handleAdd}>+ Add to list</button>)}
                                 </>
-                                : <p>You rated this movie with {watched.find(movie => movie.imdbId === selectedId)?.userRating} <span>🌟</span></p>}
+                                : <p>You rated this movie
+                                    with {watched.find(movie => movie.imdbId === selectedId)?.userRating} <span>🌟</span>
+                                </p>}
                         </div>
 
                         <p><em>{plot}</em></p>
@@ -321,11 +323,18 @@ const KEY = '151bf98b';
 // ** useEffect - 렌더링 로직에 포함되면 안되는 사이드 이펙트들을 처리한다.
 export default function App() {
     const [movies, setMovies] = useState([]);
-    const [watched, setWatched] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const [query, setQuery] = useState("");
     const [selectedId, setSelectedId] = useState(null);
+    // const [watched, setWatched] = useState([]);
+
+    // ** useState가 인자로 받는 callback의 return값으로 초기값 세팅
+    // - callback은 순수함수여야 하고, 인자를 받을 수 없다.
+    const [watched, setWatched] = useState(function () {
+        const storedValue = localStorage.getItem("watched");
+        return JSON.parse(storedValue);
+    });
 
     function handleSelectMovie(id) {
         setSelectedId(selectedId => selectedId === id ? null : id);
@@ -344,12 +353,16 @@ export default function App() {
     }
 
     useEffect(function () {
+        localStorage.setItem('watched', JSON.stringify(watched));
+    },[watched]);
+
+    useEffect(function () {
         const controller = new AbortController(); // WEB API. 리액트와 상관없음.
         async function fetchMovies() {
             try {
                 setIsLoading(true);
                 setError("");
-                const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,{signal:controller.signal});
+                const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`, {signal: controller.signal});
 
                 if (!res.ok) throw new Error("Sth went wrong with fetching movies");
 
@@ -359,7 +372,7 @@ export default function App() {
                 setMovies(data.Search);
             } catch (e) {
                 // fetch취소 에러는 에러로 출력하지 않도록.
-                if(e.name !== "AbortError") setError(e.message);
+                if (e.name !== "AbortError") setError(e.message);
             } finally {
                 setIsLoading(false);
             }
