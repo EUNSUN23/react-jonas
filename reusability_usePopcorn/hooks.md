@@ -51,3 +51,20 @@ useEffect(fnz, []);
        setLikes(likes => likes + 1);
    }
   ```
+
+## useRef
+
+👉 렌더링시에도 불변하는 데이터를 저장하는 Ref객체를 생성한다.
+👉 .current 프로퍼티를 통해 데이터를 조회/수정 할 수 있다. **(Ref도 렌더링 로직에서 조회/수정하지 말것)**
+
+- 이전 state 값, setTimeout 함수 등 렌더링으로 인해 초기화 되지 않아야하는 값 저장
+- **DOM 요소 선택 및 저장**
+
+👉 state와의 차이점
+
+- .current를 통해 값을 조회/수정해도 re-rendering이 유발되지 않는다.
+- mutable 하다
+- update를 동기적으로 수행한다 (업데이트 직후에 바뀐 값 사용 가능)
+
+
+

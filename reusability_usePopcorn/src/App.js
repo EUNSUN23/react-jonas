@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import StarRating from "./StarRating";
 
 // 151bf98b
@@ -297,6 +297,32 @@ function NumResults({num}) {
 }
 
 function Search({query, setQuery}) {
+    const inputEl = useRef(null); // 초기값 - null
+
+    // * useEffect 안에서 inputEl 사용하는 이유 *
+    // inputEl은 DOM painting이 일어날 때 ref 어트리뷰트(?)로 연결된 HTML요소와 바인딩 된다.
+    // -> DOM painting이 완료되고 나서야 inputEl의 current에 바인딩된 html요소를 사용할 수 있다.
+    useEffect(function () {
+        function callback(e) {
+            if(document.activeElement === inputEl.current) return;  // 이미 focus된 상태면 return
+            if(e.code === "Enter"){
+                inputEl.current.focus();
+                setQuery("");
+            }
+        }
+
+        document.addEventListener('keydown',callback);
+        return () => document.removeEventListener('keydown', callback);
+
+    }, [setQuery]);
+
+    // 돔을 직접 조작하는 건 React 방식이 아님
+    // dependency에 따라서는 매 렌더링마다 html요소 선택해야함
+    // useEffect(function () {
+    //    const el = document.querySelector('.search');
+    //    el.focus();
+    // },[]);
+
     return (
         <input
             className="search"
@@ -304,6 +330,7 @@ function Search({query, setQuery}) {
             placeholder="Search movies..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            ref={inputEl}
         />
     );
 }
@@ -354,7 +381,7 @@ export default function App() {
 
     useEffect(function () {
         localStorage.setItem('watched', JSON.stringify(watched));
-    },[watched]);
+    }, [watched]);
 
     useEffect(function () {
         const controller = new AbortController(); // WEB API. 리액트와 상관없음.
