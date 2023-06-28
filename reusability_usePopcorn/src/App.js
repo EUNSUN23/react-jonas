@@ -97,6 +97,13 @@ function MovieDetails({selectedId, onCloseMovie, onAddWatched, watched}) {
     const [isLoading, setIsLoading] = useState(false);
     const [userRating, setUserRating] = useState("");
 
+    const countRef = useRef(0);
+
+    // 유저가 평점 매길때마다 count
+    useEffect(function () {
+        if(userRating) countRef.current = countRef.current + 1;
+    },[userRating]);
+
     const {
         Title: title,
         Year: year,
@@ -118,7 +125,8 @@ function MovieDetails({selectedId, onCloseMovie, onAddWatched, watched}) {
             poster,
             imdbRating: Number(imdbRating),
             runtime: runtime.split(" ").at(0),
-            userRating
+            userRating,
+            countRatingDecisions:countRef.current
         }
         onAddWatched(newWatchedMovie);
         onCloseMovie();
