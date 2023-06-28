@@ -2,9 +2,7 @@
 
 ## 👉 When to use?
 
-   서로 연관이 있는 state들(update가 다른 state업데이트에 의존하는 등)을 하나의 state로 깔끔하게 관리해야 할 때
-
-
+서로 연관이 있는 state들(update가 다른 state업데이트에 의존하는 등)을 하나의 state로 깔끔하게 관리해야 할 때
 
 ## 👉 How to use?
 
@@ -14,6 +12,7 @@
   const initialState = {count: 0, step: 1}
   
   // reducer -  첫번째 인자로 현재 state를 받고, 두번째 인자로 action를 받아서 업데이트 된 state를 반환한다.
+  // reducer는 side effect없는 순수함수여야 한다(항상 현재 state와 action을 받아서 새 state를 반환해야 함)
   function reducer(state, action) {
    switch (action.type) { 
        case 'inc':
@@ -54,8 +53,4 @@
        dispatch({type: 'dec'}); // reducer함수에 넘겨주는 action 파라미터
       };
   ```
-
-
-
-
 
