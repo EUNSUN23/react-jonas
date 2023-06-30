@@ -2,7 +2,9 @@
 
 ## 👉 When to use?
 
-서로 연관이 있는 state들(update가 다른 state업데이트에 의존하는 등)을 하나의 state로 깔끔하게 관리해야 할 때
+- 한 이벤트에 여러 state가 동시에 update되어야 할 때
+- 3~4개 이상의 서로 연관성 있는 state를 관리해야할 때
+- 개별 state를 업데이트하는 이벤트 핸들러가 너무 많아서 컴포넌트가 지저분 할때
 
 ## 👉 How to use?
 
