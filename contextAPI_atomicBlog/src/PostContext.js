@@ -1,5 +1,5 @@
 // 1) context 생성
-import {createContext, useState} from "react";
+import {createContext, useContext, useState} from "react";
 import {faker} from "@faker-js/faker";
 
 export function createRandomPost() {
@@ -49,3 +49,7 @@ export function PostProvider({children}) {
     )
 }
 
+export function usePosts() {
+    const context = useContext(PostContext);
+    return context;
+}
