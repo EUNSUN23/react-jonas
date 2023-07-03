@@ -4,6 +4,7 @@ import Product from "./pages/Product.jsx";
 import Pricing from "./pages/Pricing.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import PageNotFound from "./pages/PageNotFound.jsx";
+import AppLayout from "./pages/AppLayout.jsx";
 
 function App() {
     return (
@@ -12,6 +13,7 @@ function App() {
                 <Route path="/" element={<HomePage/>}/>
                 <Route path="product" element={<Product/>}/>
                 <Route path="pricing" element={<Pricing/>}/>
+                <Route path="app" element={<AppLayout/>}/>
                 <Route path="*" element={<PageNotFound/>}/> {/* 위 path에 모두 해당하지 않는 url에 매칭 */}
             </Routes>
         </BrowserRouter>
