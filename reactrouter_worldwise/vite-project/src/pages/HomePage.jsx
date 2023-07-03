@@ -1,16 +1,20 @@
-import React from 'react';
-import {Link} from "react-router-dom";
-import PageNav from "../components/PageNav.jsx";
+import styles from "./Homepage.module.css";
 
-function HomePage() {
+export default function Homepage() {
     return (
-        <div>
-            <PageNav/>
-            <h1>WorldWise</h1>
-            <Link to="/app">Go to the app</Link> {/* 클릭시 DOM만 업데이트 될 뿐 페이지 리로딩은 일어나지 않는다. */}
-            {/*<a href="/pricing">Pricing</a> /!* 클릭시 페이지 리로딩이 일어난다 *!/*/}
-        </div>
+        <main className={styles.homepage}>
+            <section>
+                <h1>
+                    You travel the world.
+                    <br />
+                    WorldWise keeps track of your adventures.
+                </h1>
+                <h2>
+                    A world map that tracks your footsteps into every city you can think
+                    of. Never forget your wonderful experiences, and show your friends how
+                    you have wandered the world.
+                </h2>
+            </section>
+        </main>
     );
 }
-
-export default HomePage;

@@ -1,4 +1,3 @@
-import React from 'react';
 import PageNav from "../components/PageNav.jsx";
 
 function PageNotFound() {

@@ -1,4 +1,3 @@
-import React from 'react';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Product from "./pages/Product.jsx";
 import Pricing from "./pages/Pricing.jsx";

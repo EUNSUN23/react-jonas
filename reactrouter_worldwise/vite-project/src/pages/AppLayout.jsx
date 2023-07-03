@@ -1,7 +1,6 @@
-import React from 'react';
 import AppNav from "../components/AppNav.jsx";
 
-function AppLayout(props) {
+function AppLayout() {
     return (
         <div>
             <AppNav/>
