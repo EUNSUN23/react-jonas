@@ -1,12 +1,15 @@
 import styles from "./Homepage.module.css";
+import {Link} from "react-router-dom";
+import PageNav from "../components/PageNav.jsx";
 
 export default function Homepage() {
     return (
         <main className={styles.homepage}>
+            <PageNav/>
             <section>
                 <h1>
                     You travel the world.
-                    <br />
+                    <br/>
                     WorldWise keeps track of your adventures.
                 </h1>
                 <h2>
@@ -14,6 +17,7 @@ export default function Homepage() {
                     of. Never forget your wonderful experiences, and show your friends how
                     you have wandered the world.
                 </h2>
+                <Link to="/app" className='cta'>Start tracking now</Link>
             </section>
         </main>
     );
