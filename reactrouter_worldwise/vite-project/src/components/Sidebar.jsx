@@ -8,7 +8,7 @@ function Sidebar() {
         <div className={styles.sidebar}>
             <Logo/>
             <AppNav/>
-            <Outlet/> {/* route path와 매치되는 컴포넌트 표시 */}
+            <Outlet/> {/* AppLayout컴포넌트의 nested route와 매치되는 컴포넌트 표시 */}
             <footer className={styles.footer}>
                 <p className={styles.copyright}>
                     &copy; Copyright {new Date().getFullYear()}
