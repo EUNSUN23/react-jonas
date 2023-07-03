@@ -1,13 +1,14 @@
 import styles from './Sidebar.module.css';
 import Logo from "./Logo.jsx";
 import AppNav from "./AppNav.jsx";
+import {Outlet} from "react-router-dom";
 
 function Sidebar() {
     return (
         <div className={styles.sidebar}>
             <Logo/>
             <AppNav/>
-            <p>List of cites</p>
+            <Outlet/> {/* route path와 매치되는 컴포넌트 표시 */}
             <footer className={styles.footer}>
                 <p className={styles.copyright}>
                     &copy; Copyright {new Date().getFullYear()}
