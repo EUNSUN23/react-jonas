@@ -8,6 +8,7 @@ import AppLayout from "./pages/AppLayout.jsx";
 import Login from "./pages/Login.jsx";
 import CityList from "./components/CityList.jsx";
 import {useEffect, useState} from "react";
+import CountryList from "./components/CountryList";
 
 const BASE_URL = 'http://localhost:8000';
 function App() {
@@ -42,7 +43,7 @@ function App() {
                 <Route path="app" element={<AppLayout/>}> {/* nested routes */}
                     <Route index element={<CityList cities={cities} isLoading={isLoading}/>}/> {/* root path (/app)에 대한 매칭 */}
                     <Route path='cities' element={<CityList cities={cities} isLoading={isLoading}/>}/>
-                    <Route path='countries' element={<p>Countries</p>}/>
+                    <Route path='countries' element={<CountryList cities={cities} isLoading={isLoading}/>}/>
                     <Route path='form' element={<p>Form</p>}/>
                 </Route>
                 <Route path="*" element={<PageNotFound/>}/> {/* 위 path에 모두 해당하지 않는 url에 매칭 */}
