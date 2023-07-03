@@ -1,4 +1,5 @@
 import styles from "./City.module.css";
+import {useParams, useSearchParams} from "react-router-dom";
 
 const formatDate = (date) =>
   new Intl.DateTimeFormat("en", {
@@ -9,6 +10,11 @@ const formatDate = (date) =>
   }).format(new Date(date));
 
 function City() {
+    // * City컴포넌트와 매칭되는 라우터 url의 parameter 사용하기 *
+    const {id} = useParams();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const lat = searchParams.get('lat');
+    const lng = searchParams.get('lng');
   // TEMP DATA
   const currentCity = {
     cityName: "Lisbon",
@@ -22,7 +28,7 @@ function City() {
   return (
     <div className={styles.city}>
       <div className={styles.row}>
-        <h6>City name</h6>
+        <h6>City {id}</h6>
         <h3>
           <span>{emoji}</span> {cityName}
         </h3>
