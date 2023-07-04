@@ -1,22 +1,72 @@
 import styles from './Map.module.css';
 import {useNavigate, useSearchParams} from "react-router-dom";
+import {MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents} from "react-leaflet";
+import {useEffect, useState} from "react";
+import {useCities} from "../context/CitiesContext.jsx";
+import {useGeolocation} from "../hooks/useGeolocation.js";
+import Button from "./Button.jsx";
+import {useUrlPosition} from "../hooks/useUrlPosition.js";
 
 function Map() {
-    // ** Link, NavLink통하지 않고 navigate하기 - useNavigate
-    const navigate = useNavigate();
+    const {cities} = useCities();
+    const [mapPosition, setMapPosition] = useState([40, 0]);
+    const {isLoading: isLoadingPosition, position: geolocationPosition, getPosition} = useGeolocation();
+    const [mapLat, mapLng] = useUrlPosition();
 
-    // ** 현재 url parameter 사용하기 - url에 저장된 state는 모든 컴포넌트에서 접근 가능하다.
-    // * setSearchParams : 현재 url parameter 변경 메서드. url뿐 아니라 전체 컴포넌트에서 사용하는 해당 param값이 업데이트된다.
-    const [searchParams, setSearchParams] = useSearchParams();
-    const lat = searchParams.get('lat');
-    const lng = searchParams.get('lng');
+    useEffect(function () {
+        if (mapLat && mapLng) setMapPosition([mapLat, mapLng]);
+    }, [mapLat, mapLng]);
+
+    useEffect(function () {
+        if (geolocationPosition) setMapPosition([geolocationPosition.lat, geolocationPosition.lng]);
+    }, [geolocationPosition]);
 
 
     return (
-        <div className={styles.mapContainer} onClick={()=>{navigate('form')}}>
-
+        <div className={styles.mapContainer}>
+            {
+                !geolocationPosition && (
+                    <Button type="position" onClick={getPosition}>
+                        {isLoadingPosition ? 'Loading...' : 'Use your position'}
+                    </Button>
+                )}
+            <MapContainer
+                className={styles.map}
+                center={mapPosition}
+                zoom={6}
+                scrollWheelZoom={true}
+            >
+                <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+                />
+                {cities.map((city) => (
+                    <Marker position={[city.position.lat, city.position.lng]}
+                            key={city.id}>
+                        <Popup>
+                            <span>{city.emoji}</span>
+                            <span>{city.cityName}</span>
+                        </Popup>
+                    </Marker>
+                ))}
+                <ChangeCenter position={mapPosition}/>
+                <DetectClick/>
+            </MapContainer>
         </div>
     );
+}
+
+function ChangeCenter({position}) {
+    const map = useMap();
+    map.setView(position);
+    return null;
+}
+
+function DetectClick() {
+    const navigate = useNavigate();
+    useMapEvents({
+        click: e => navigate(`form?lat=${e.latlng.lat}&lng=${e.latlng.lng}`),
+    })
 }
 
 export default Map;
