@@ -1,4 +1,4 @@
-import {memo, useEffect, useMemo, useState} from "react";
+import {memo, useCallback, useEffect, useMemo, useState} from "react";
 import {faker} from "@faker-js/faker";
 
 function createRandomPost() {
@@ -25,9 +25,9 @@ function App() {
             )
             : posts;
 
-    function handleAddPost(post) {
+    const handleAddPost = useCallback(function handleAddPost(post) { // useMemo와의 차이 : useMemo는 callback실행시 반환되는 값을 기억하고, useCallback은 callback자체를 기억한다.
         setPosts((posts) => [post, ...posts]);
-    }
+    },[])
 
     function handleClearPosts() {
         setPosts([]);
@@ -65,7 +65,7 @@ function App() {
                 setSearchQuery={setSearchQuery}
             />
             <Main posts={searchedPosts} onAddPost={handleAddPost}/>
-            <Archive archiveOptions={archiveOptions}/>
+            <Archive archiveOptions={archiveOptions} onAddPost={handleAddPost}/>
             <Footer/>
         </section>
     );
@@ -162,7 +162,7 @@ function List({posts}) {
     );
 }
 
-const Archive = memo(function Archive({archiveOptions}) {
+const Archive = memo(function Archive({archiveOptions, onAddPost}) {
     const [posts] = useState(() =>
         Array.from({length: 10000}, () => createRandomPost())
     );
@@ -183,7 +183,7 @@ const Archive = memo(function Archive({archiveOptions}) {
                             <p>
                                 <strong>{post.title}:</strong> {post.body}
                             </p>
-                            {/*<button onClick={() => onAddPost(post)}>Add as new post</button>*/}
+                            <button onClick={() => onAddPost(post)}>Add as new post</button>
                         </li>
                     ))}
                 </ul>
