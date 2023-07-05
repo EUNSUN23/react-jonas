@@ -25,7 +25,7 @@
   - 렌더링시 실행되는 로직 비용을 줄이기 위해
   - 다른 hook의 디펜던시 값에 대해 memoization하기 위해
     <br/>
-- **context optimization**
+- **context optimization** 
   
   - context의 state가 항상 바뀌고, 컨슈머가 많고, 애플리케이션이 실제로 느릴 때 수행한다
 
@@ -64,4 +64,18 @@ export default function Test() {
 
 - 3rd-party 라이브러리 사용 최소화
 - 코드 스플리팅 & lazy loading
+  
+  - 번들을 여러개의 js파일로 나눠서 필요할때에(해당 컴포넌트 써야할 때)각각 로딩하는 것
+  - 주로 page(Route)단위로 코드 스플리팅을 한다.
+
+---
+
+
+
+
+---
+
+---
+
+---
 
