@@ -30,7 +30,25 @@ useEffect(function () {
 
 👉 **dependency array요소가 변할 때 마다 이펙트는 재실행된다.**
 
+### dependency array rules
+
 👉 useEffect의 이펙트 실행 함수 내에서 쓰는 props, state는 반드시 dependency array에 포함되어야 한다.
+
+👉 컴포넌트가 구독하는 context value, props, state와 관련된 모든 reactive value도 dependency array에 포함되어야 한다. --> eslint가 경고하는 value들은 전부 넣자.
+
+👉 object나 배열은 렌더링시마다 재생성되므로 dependency로 넣지 말자.
+
+✅ **불필요한 함수 dependency 줄이는 법**
+
+- useEffect안에서만 사용하는 함수는 useEffect안에서 선언하자
+- useEffect밖에서도 사용하는 함수는 useCallback으로 memoization
+- 어떤 reactive value도 사용하지 않는 함수라면 아예 컴포넌트 밖으로 빼자
+
+✅ **불필요한 객체 dependency 줄이는 법**
+
+- 되도록 원시데이터만 useEffect내에서 사용하자
+- 객체를 써야한다면 memoization 하기
+- state setter나 useReducer의 dispatch는 기본적으로 리액트에 의해 동일성이 보장되므로 디펜던시에 추가하지 않아도 된다.
 
 ## useEffect의 cleanup function
 
@@ -43,4 +61,12 @@ useEffect(function () {
 ex) useEffect로 실행시킨 이전 http 요청이 계속 pending인 상태에서 똑같은 http요청을 보내는 경우 race condition 버그가 발생하므로, cleanup function을 통해서 이전 request는 취소해주는 것이 좋다.
 
 ✅ 한 useEffect에서는 하나의 이펙트만 처리하도록 하자. cleanup하기에 훨씬 수월하다.
+
+## useEffect 사용을 지양해야하는 경우(과사용 금지!)
+
+👉 이벤트 핸들러 함수로 처리할 수 있는 사용자 이벤트
+👉 초기마운트시 data fetching -> 작은 프로젝트에선 괜찮지만 실무에선 React Query로 처리한다.
+👉 한 state 업데이트를 기반으로 다른 state 업데이트 
+
+
 
