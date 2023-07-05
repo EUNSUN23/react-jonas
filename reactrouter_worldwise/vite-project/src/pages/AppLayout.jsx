@@ -1,11 +1,16 @@
 import Sidebar from "../components/Sidebar.jsx";
 import styles from './AppLayout.module.css';
 import Map from "../components/Map.jsx";
+import User from "../components/User.jsx";
+import React, {useEffect} from "react";
+import {useAuth} from "../context/FakeAuthContext.jsx";
+import {useNavigate} from "react-router-dom";
 
 function AppLayout() {
     return (
         <div className={styles.app}>
-           <Sidebar/>
+            <User/>
+            <Sidebar/>
             <Map/>
         </div>
     );

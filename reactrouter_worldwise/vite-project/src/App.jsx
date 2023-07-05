@@ -11,29 +11,34 @@ import CountryList from "./components/CountryList";
 import City from "./components/City.jsx";
 import Form from "./components/Form.jsx";
 import {CitiesProvider} from "./context/CitiesContext.jsx";
+import {AuthProvider} from "./context/FakeAuthContext";
 
 
 function App() {
     return (
-        <CitiesProvider>
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<HomePage/>}/>
-                    <Route path="product" element={<Product/>}/>
-                    <Route path="pricing" element={<Pricing/>}/>
-                    <Route path="/login" element={<Login/>}/>
-                    <Route path="app" element={<AppLayout/>}> {/* nested routes */}
-                        <Route index
-                               element={<Navigate to='cities' replace/>}/> {/* root path (/app)에 대한 매칭 */} {/* Navigate : cities로 리다이렉팅 replace : history 대체 */}
-                        <Route path='cities' element={<CityList />}/>
-                        <Route path='cities/:id' element={<City/>}/> {/* :id -> parameter와 매칭되는 key가 된다. */}
-                        <Route path='countries' element={<CountryList />}/>
-                        <Route path='form' element={<Form/>}/>
-                    </Route>
-                    <Route path="*" element={<PageNotFound/>}/> {/* 위 path에 모두 해당하지 않는 url에 매칭 */}
-                </Routes>
-            </BrowserRouter>
-        </CitiesProvider>
+        <AuthProvider>
+            <CitiesProvider>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/" element={<HomePage/>}/>
+                        <Route path="product" element={<Product/>}/>
+                        <Route path="pricing" element={<Pricing/>}/>
+                        <Route path="/login" element={<Login/>}/>
+                        <Route path="app" element={<AppLayout/>}> {/* nested routes */}
+                            <Route index
+                                   element={<Navigate to='cities'
+                                                      replace/>}/> {/* root path (/app)에 대한 매칭 */} {/* Navigate : cities로 리다이렉팅 replace : history 대체 */}
+                            <Route path='cities' element={<CityList/>}/>
+                            <Route path='cities/:id' element={<City/>}/> {/* :id -> parameter와 매칭되는 key가 된다. */}
+                            <Route path='countries' element={<CountryList/>}/>
+                            <Route path='form' element={<Form/>}/>
+                        </Route>
+                        <Route path="*" element={<PageNotFound/>}/> {/* 위 path에 모두 해당하지 않는 url에 매칭 */}
+                    </Routes>
+                </BrowserRouter>
+            </CitiesProvider>
+        </AuthProvider>
+
     );
 }
 
