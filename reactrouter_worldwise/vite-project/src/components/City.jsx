@@ -23,7 +23,7 @@ function City() {
 
     useEffect(function () {
         getCity(id);
-    },[id]);
+    },[id, getCity]); // getCity는 CitiesProvider가 리렌더링될때마다 재생성되는데, getCity가 context를 업데이트하므로 매번 재생성됨. memoization없이 디펜던시에 추가하면 무한 loop를 유발한다.
 
     const {cityName, emoji, date, notes} = currentCity;
 
