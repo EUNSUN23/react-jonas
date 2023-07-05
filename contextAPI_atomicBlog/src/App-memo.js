@@ -65,7 +65,11 @@ function App() {
                 setSearchQuery={setSearchQuery}
             />
             <Main posts={searchedPosts} onAddPost={handleAddPost}/>
-            <Archive archiveOptions={archiveOptions} onAddPost={handleAddPost}/>
+            <Archive
+                archiveOptions={archiveOptions}
+                onAddPost={handleAddPost}
+                setIsFakeDark={setIsFakeDark} {/* state setter는 memoization이 기본으로 보장된다. --> 각종 hook들의 디펜던시에서 빠져도 되는 이유. */}
+            />
             <Footer/>
         </section>
     );
