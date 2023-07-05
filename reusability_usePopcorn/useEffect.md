@@ -34,7 +34,7 @@ useEffect(function () {
 
 👉 useEffect의 이펙트 실행 함수 내에서 쓰는 props, state는 반드시 dependency array에 포함되어야 한다.
 
-👉 컴포넌트가 구독하는 context value, props, state와 관련된 모든 reactive value도 dependency array에 포함되어야 한다. --> eslint가 경고하는 value들은 전부 넣자.
+👉 useEffect 이펙트 실행 함수 내에서 쓰이는 context value, props, state와 관련된 모든 reactive value도 dependency array에 포함되어야 한다. --> eslint가 경고하는 value들은 전부 넣자.
 
 👉 object나 배열은 렌더링시마다 재생성되므로 dependency로 넣지 말자.
 
@@ -66,7 +66,5 @@ ex) useEffect로 실행시킨 이전 http 요청이 계속 pending인 상태에�
 
 👉 이벤트 핸들러 함수로 처리할 수 있는 사용자 이벤트
 👉 초기마운트시 data fetching -> 작은 프로젝트에선 괜찮지만 실무에선 React Query로 처리한다.
-👉 한 state 업데이트를 기반으로 다른 state 업데이트 
-
-
+👉 한 state 업데이트를 기반으로 다른 state 업데이트
 
