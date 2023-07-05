@@ -23,7 +23,11 @@
   
   - memo와 함께 컴포넌트 리렌더링 자체를 줄이기 위해(props에 대한 memoization 수행)
   - 렌더링시 실행되는 로직 비용을 줄이기 위해
-  - 다른 hook의 디펜던시 값에 대해 memoization하기 위해 
+  - 다른 hook의 디펜던시 값에 대해 memoization하기 위해
+    <br/>
+- **context optimization**
+  
+  - context의 state가 항상 바뀌고, 컨슈머가 많고, 애플리케이션이 실제로 느릴 때 수행한다
 
 <br/>
 

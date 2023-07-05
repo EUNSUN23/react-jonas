@@ -1,5 +1,5 @@
 // 1) context 생성
-import {createContext, useContext, useState} from "react";
+import {createContext, useContext, useMemo, useState} from "react";
 import {faker} from "@faker-js/faker";
 
 export function createRandomPost() {
@@ -37,15 +37,20 @@ export function PostProvider({children}) {
         setPosts([]);
     }
 
-    return (
-        // 2) Provider를 통해서 value를 자식 컴포넌트들에 전달한다.
-        <PostContext.Provider value={{
+    // context 성능최적화
+    const value = useMemo(function () {
+        return {
             posts: searchedPosts,
             onAddPost: handleAddPost,
             onClearPost: handleClearPosts,
             searchQuery,
             setSearchQuery
-        }}>{children}</PostContext.Provider>
+        }
+    },[searchedPosts,searchQuery]);
+
+    return (
+        // 2) Provider를 통해서 value를 자식 컴포넌트들에 전달한다.
+        <PostContext.Provider value={value}>{children}</PostContext.Provider>
     )
 }
 
