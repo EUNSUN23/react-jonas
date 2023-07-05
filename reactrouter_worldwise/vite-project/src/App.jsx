@@ -12,6 +12,7 @@ import City from "./components/City.jsx";
 import Form from "./components/Form.jsx";
 import {CitiesProvider} from "./context/CitiesContext.jsx";
 import {AuthProvider} from "./context/FakeAuthContext";
+import ProtectedRoute from "./pages/ProtectedRoute.jsx";
 
 
 function App() {
@@ -24,7 +25,11 @@ function App() {
                         <Route path="product" element={<Product/>}/>
                         <Route path="pricing" element={<Pricing/>}/>
                         <Route path="/login" element={<Login/>}/>
-                        <Route path="app" element={<AppLayout/>}> {/* nested routes */}
+                        <Route path="app" element={
+                            <ProtectedRoute>
+                                <AppLayout/>
+                            </ProtectedRoute>
+                        }> {/* nested routes */}
                             <Route index
                                    element={<Navigate to='cities'
                                                       replace/>}/> {/* root path (/app)에 대한 매칭 */} {/* Navigate : cities로 리다이렉팅 replace : history 대체 */}

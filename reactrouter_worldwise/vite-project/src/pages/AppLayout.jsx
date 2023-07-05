@@ -5,6 +5,7 @@ import User from "../components/User.jsx";
 import React, {useEffect} from "react";
 import {useAuth} from "../context/FakeAuthContext.jsx";
 import {useNavigate} from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute.jsx";
 
 function AppLayout() {
     return (
