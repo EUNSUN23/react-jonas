@@ -61,7 +61,7 @@ export function CitiesProvider({children}) {
         } catch (e) {
             dispatch({type: 'rejected', payload: "There was an error loading city..."});
         }
-    },[]);
+    },[currentCity.id]);
 
     async function createCity(newCity) {
         try {
