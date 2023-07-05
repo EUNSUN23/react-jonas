@@ -15,8 +15,15 @@
   : 부모 컴포넌트가 리렌더링 되어도 넘겨받는 props가 변하지 않으면 리렌더링 되지 않는 컴포넌트 생성
   (props 변화 외에 구독하는 context의 변화, 자기 자신의 state변화 등으로 인한 리렌더링은 막지 못한다)
   렌더링 비용이 많이들어서 ui가 느려지는 무거운 컴포넌트에만 적용해줘도 충분하다.
-- useMemo : 객체 Memoize
-- useCallback : 함수 memoize
+  
+  단 부모가 리렌더링시 내려주는 props가 렌더링마다 새로 생성되는 **함수/객체** 등이면 매 렌더링마다 다른 props를 받는 것으로 인지하므로 memoization이 되지 않는다. -> 내려주는 props에 대해서 **useMemo**나 **useCallback**으로 memoize해줘야 한다.
+  <br/>
+- **useMemo(객체 Memoize), useCallback(함수 memoize)**
+  : 디펜던시 값이 변하지 않는 이상, 인자로 받는 값을 메모리에 저장하고 재렌더링시 저장한 값을 반환한다. 디펜던시 값이 변하면 새 인자값을 생성해서 메모리에 저장한다.
+  
+  - memo와 함께 컴포넌트 리렌더링 자체를 줄이기 위해(props에 대한 memoization 수행)
+  - 렌더링시 실행되는 로직 비용을 줄이기 위해
+  - 다른 hook의 디펜던시 값에 대해 memoization하기 위해 
 
 <br/>
 

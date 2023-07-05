@@ -1,5 +1,5 @@
-import {memo, useEffect, useState} from "react";
-import { faker } from "@faker-js/faker";
+import {memo, useEffect, useMemo, useState} from "react";
+import {faker} from "@faker-js/faker";
 
 function createRandomPost() {
     return {
@@ -10,7 +10,7 @@ function createRandomPost() {
 
 function App() {
     const [posts, setPosts] = useState(() =>
-        Array.from({ length: 30 }, () => createRandomPost())
+        Array.from({length: 30}, () => createRandomPost())
     );
     const [searchQuery, setSearchQuery] = useState("");
     const [isFakeDark, setIsFakeDark] = useState(false);
@@ -41,6 +41,14 @@ function App() {
         [isFakeDark]
     );
 
+    // useMemo의 callback함수는 초기렌더링시 한번만 실행되어서 반환하는 값을 캐시에 저장하고, 디펜던시 값이 변할 때 실행되어서 새 값을 저장한다.
+    const archiveOptions = useMemo(() => {
+        return {
+            show: false,
+            title: `Post archive in addition to ${posts.length} main post`
+        };
+    }, [posts.length]); // 비워두면 초기렌더링시에만 실행됨.
+
     return (
         <section>
             <button
@@ -56,21 +64,21 @@ function App() {
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
             />
-            <Main posts={searchedPosts} onAddPost={handleAddPost} />
-            <Archive show={false} />
-            <Footer />
+            <Main posts={searchedPosts} onAddPost={handleAddPost}/>
+            <Archive archiveOptions={archiveOptions}/>
+            <Footer/>
         </section>
     );
 }
 
-function Header({ posts, onClearPosts, searchQuery, setSearchQuery }) {
+function Header({posts, onClearPosts, searchQuery, setSearchQuery}) {
     return (
         <header>
             <h1>
                 <span>⚛️</span>The Atomic Blog
             </h1>
             <div>
-                <Results posts={posts} />
+                <Results posts={posts}/>
                 <SearchPosts
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
@@ -81,7 +89,7 @@ function Header({ posts, onClearPosts, searchQuery, setSearchQuery }) {
     );
 }
 
-function SearchPosts({ searchQuery, setSearchQuery }) {
+function SearchPosts({searchQuery, setSearchQuery}) {
     return (
         <input
             value={searchQuery}
@@ -91,35 +99,35 @@ function SearchPosts({ searchQuery, setSearchQuery }) {
     );
 }
 
-function Results({ posts }) {
+function Results({posts}) {
     return <p>🚀 {posts.length} atomic posts found</p>;
 }
 
-function Main({ posts, onAddPost }) {
+function Main({posts, onAddPost}) {
     return (
         <main>
-            <FormAddPost onAddPost={onAddPost} />
-            <Posts posts={posts} />
+            <FormAddPost onAddPost={onAddPost}/>
+            <Posts posts={posts}/>
         </main>
     );
 }
 
-function Posts({ posts }) {
+function Posts({posts}) {
     return (
         <section>
-            <List posts={posts} />
+            <List posts={posts}/>
         </section>
     );
 }
 
-function FormAddPost({ onAddPost }) {
+function FormAddPost({onAddPost}) {
     const [title, setTitle] = useState("");
     const [body, setBody] = useState("");
 
     const handleSubmit = function (e) {
         e.preventDefault();
         if (!body || !title) return;
-        onAddPost({ title, body });
+        onAddPost({title, body});
         setTitle("");
         setBody("");
     };
@@ -141,7 +149,7 @@ function FormAddPost({ onAddPost }) {
     );
 }
 
-function List({ posts }) {
+function List({posts}) {
     return (
         <ul>
             {posts.map((post, i) => (
@@ -154,16 +162,16 @@ function List({ posts }) {
     );
 }
 
-const Archive = memo(function Archive({ show }) {
+const Archive = memo(function Archive({archiveOptions}) {
     const [posts] = useState(() =>
-        Array.from({ length: 10000 }, () => createRandomPost())
+        Array.from({length: 10000}, () => createRandomPost())
     );
 
-    const [showArchive, setShowArchive] = useState(show);
+    const [showArchive, setShowArchive] = useState(archiveOptions.show);
 
     return (
         <aside>
-            <h2>Post archive</h2>
+            <h2>{archiveOptions.title}</h2>
             <button onClick={() => setShowArchive((s) => !s)}>
                 {showArchive ? "Hide archive posts" : "Show archive posts"}
             </button>
