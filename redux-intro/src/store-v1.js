@@ -4,15 +4,17 @@ import {customerReducer} from "./features/customers/customerSlice";
 import {accountReducer} from "./features/accounts/accountSlice";
 import {composeWithDevTools} from "redux-devtools-extension";
 
+import {configureStore} from '@reduxjs/toolkit';
+
 // combine reducer
 const rootReducer = combineReducers({
     account:accountReducer,
     customer:customerReducer
 });
 
-const store = createStore(
+const storeV1 = createStore(
     rootReducer,
     composeWithDevTools(applyMiddleware(thunk))
 );
 
-export default store;
+export default storeV1;
