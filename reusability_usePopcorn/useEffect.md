@@ -68,3 +68,19 @@ ex) useEffect로 실행시킨 이전 http 요청이 계속 pending인 상태에�
 👉 초기마운트시 data fetching -> 작은 프로젝트에선 괜찮지만 실무에선 React Query로 처리한다.
 👉 한 state 업데이트를 기반으로 다른 state 업데이트
 
+## useEffect안의 closure원리
+
+👉 closure란, 함수가 생성되었을 때의 렉시컬 스코프의 모든 변수를 기억했다가 함수 호출시 사용하는, 함수가 자기 내부
+변수들에 대한 closure로 동작하는 현상을 말한다.
+
+👉 클로저 원리로 인해서, 이펙트함수는 디펜던시에 추가된 변수들 외의 다른 변수들에 대해서는 함수가 이전에 생성되었을 때의 값으로 기억하고 있다. 그래서 이펙트 함수 내에서 사용하는 모든 reactive value들은 디펜던시에 추가해야 한다.
+
+```js
+useEffect(function () {
+      console.log(duration, sets); 
+      document.title = `Your ${number}-exercise workout`;  
+     },[number]); 
+```
+
+
+

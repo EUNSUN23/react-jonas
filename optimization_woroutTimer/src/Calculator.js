@@ -11,6 +11,7 @@ function Calculator({workouts, allowSound}) {
     // durationBreak와 duration state 동기화하기 -> useEffect내에서 state기반 다른state업데이트는 렌더링 커밋을 일으키므로 지양해야하지만
     // 이벤트핸들러에서 처리하면 number, sets, speed, duration이벤트 핸들러에 각각 setDuration을 추가해서 코드가 늘어나므로 여기선 ok.
     useEffect(function () {
+        console.log("setDuration effect");
         setDuration((number * sets * speed) / 60 + (sets - 1) * durationBreak);
     }, [number, sets, speed, durationBreak]);
 
@@ -23,6 +24,11 @@ function Calculator({workouts, allowSound}) {
         };
         playSound();
     },[duration, allowSound]); // duration은 effect함수내에서 사용하지 않지만 effect실행 위해 추가.
+
+    // useEffect(function () {
+    //     console.log(duration, sets);
+    //     document.title = `Your ${number}-exercise workout`;
+    // },[number]);
 
     // const duration = (number * sets * speed) / 60 + (sets - 1) * durationBreak;
     const mins = Math.floor(duration);
