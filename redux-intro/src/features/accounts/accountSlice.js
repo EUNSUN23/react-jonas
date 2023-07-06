@@ -17,38 +17,55 @@ const accountSlice = createSlice(
         name: 'account',
         initialState,
         reducers: {
-            deposit: { // 'account/deposit'
-                prepare(amount, currency) {
-                    // reduxtoolkit가 생성한 action creator는 인자를 하나만 받기 때문에,
-                    // 두개 인자를 받기 위해 prepare로 payload를 새로 만든다.
-                    return {payload: {amount, currency}};
-                },
-                reducer(state, action) {
-                    state.balance += action.payload;
-                }
+            deposit(state, action) { // 'account/deposit'
+                state.balance -= action.payload;
+                state.isLoading = false;
             },
             withdraw(state, action) {
                 state.balance -= action.payload;
             },
             requestLoan: {
-                prepare(amount, purpose) {
-                    return {payload: {amount, purpose}}
+                prepare(amount, purpose) { // 인자 2개 받기위한 prepare
+                    return {
+                        payload: {amount, purpose}
+                    };
                 },
+
                 reducer(state, action) {
-                    if (state.loan === 0) return; // state를 반환할 필요 없다.
+                    if (state.loan > 0) return; // state를 반환할 필요 없다.
                     state.loan = action.payload.amount;
                     state.loanPurpose = action.payload.purpose;
-                    state.balance += action.payload.amount;
-                }
+                    state.balance = state.balance + action.payload.amount;
+                },
             },
             payLoan(state, action) {
                 state.balance -= state.loan;
                 state.loan = 0;
                 state.loanPurpose = '';
             },
+            convertingCurrency(state) {
+                state.isLoading = true;
+            },
         }
     });
 
-export const {deposit, withdraw, requestLoan, payLoan} = accountSlice.actions;
+export const {withdraw, requestLoan, payLoan} = accountSlice.actions;
+
+// redux-toolkit 방식이 아니라 기존 redux 방식이지만 훨씬 간단하고 redux-toolkit과 함께 사용가능하므로..
+export function deposit(amount, currency) {
+    if (currency === 'USD') return {type: 'account/deposit', payload: amount};
+
+    // middleware(thunk)사용해서 api 호출  --> api호출 등 미들웨어 작업이 끝나야 dispatch가 발생하게끔 한다.
+    return async function (dispatch, getState) {
+        dispatch({type: 'account/convertingCurrency'});
+        // API CALL
+        const res = await fetch(`https://api.frankfurter.app/latest?amount=${amount}&from=${currency}&to=USD`);
+        const data = await res.json();
+        const converted = data.rates.USD;
+
+        dispatch({type: 'account/deposit', payload: converted});
+    };
+
+}
 
 export default accountSlice.reducer;
