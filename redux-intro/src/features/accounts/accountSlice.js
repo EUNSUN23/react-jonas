@@ -1,3 +1,10 @@
+import {createSlice} from '@reduxjs/toolkit';
+
+// * createSlice *
+// - reducer에 대한 action creator를 자동으로 생성한다
+// - switch문, default문을 자동으로 핸들링한다.
+// - reducer함수내에서 mutable한 로직을 사용할 수 있다. (Immer라이브러리가 내부적으로 immutable한 로직으로 변환)
+
 const initialState = {
     balance: 0,
     loan: 0,
@@ -5,48 +12,43 @@ const initialState = {
     isLoading: false
 };
 
-export function accountReducer(state = initialState, action) {
-    switch (action.type) {
-        case 'account/deposit':
-            return {...state, balance: state.balance + action.payload, isLoading: false};
-        case 'account/withdraw':
-            return {...state, balance: state.balance - action.payload};
-        case 'account/requestLoan':
-            if (state.loan > 0) return state;
-            return {...state, loan: action.payload.amount, loanPurpose: action.payload.purpose};
-        case 'account/payLoan':
-            return {...state, loan: 0, loanPurpose: '', balance: state.balance - state.loan};
-        case 'account/convertingCurrency':
-            return {...state, isLoading: true};
-        default:
-            return state; // context의 reducer와 다르게, 에러 던지는것 권장 x
-    }
-}
+const accountSlice = createSlice(
+    {
+        name: 'account',
+        initialState,
+        reducers: {
+            deposit: { // 'account/deposit'
+                prepare(amount, currency) {
+                    // reduxtoolkit가 생성한 action creator는 인자를 하나만 받기 때문에,
+                    // 두개 인자를 받기 위해 prepare로 payload를 새로 만든다.
+                    return {payload: {amount, currency}};
+                },
+                reducer(state, action) {
+                    state.balance += action.payload;
+                }
+            },
+            withdraw(state, action) {
+                state.balance -= action.payload;
+            },
+            requestLoan: {
+                prepare(amount, purpose) {
+                    return {payload: {amount, purpose}}
+                },
+                reducer(state, action) {
+                    if (state.loan === 0) return; // state를 반환할 필요 없다.
+                    state.loan = action.payload.amount;
+                    state.loanPurpose = action.payload.purpose;
+                    state.balance += action.payload.amount;
+                }
+            },
+            payLoan(state, action) {
+                state.balance -= state.loan;
+                state.loan = 0;
+                state.loanPurpose = '';
+            },
+        }
+    });
 
-export function deposit(amount, currency) {
-    if (currency === 'USD') return {type: 'account/deposit', payload: amount};
+export const {deposit, withdraw, requestLoan, payLoan} = accountSlice.actions;
 
-    // middleware(thunk)사용해서 api 호출  --> api호출 등 미들웨어 작업이 끝나야 dispatch가 발생하게끔 한다.
-    return async function (dispatch, getState) {
-        dispatch({type: 'account/convertingCurrency'});
-        // API CALL
-        const res = await fetch(`https://api.frankfurter.app/latest?amount=${amount}&from=${currency}&to=USD`);
-        const data = await res.json();
-        const converted = data.rates.USD;
-
-        dispatch({type: 'account/deposit', payload: converted});
-    };
-
-}
-
-export function requestLoan(amount, purpose) {
-    return {type: 'account/requestLoan', payload: {amount: amount, purpose: purpose}};
-}
-
-export function withdraw(payload) {
-    return {type: 'account/withdraw', payload: payload};
-}
-
-export function payLoan() {
-    return {type: 'account/payLoan'};
-}
+export default accountSlice.reducer;
