@@ -20,7 +20,8 @@ const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
             // cached된 데이터가 유효한 시간(staleTime이 지나면 re-fetching됨)
-            staleTime: 60 * 1000, // 1분
+            // staleTime: 60 * 1000, // 1분
+            staleTime: 0, // 1분
         }
     }
 });
