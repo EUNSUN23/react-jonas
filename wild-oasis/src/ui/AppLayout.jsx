@@ -8,8 +8,6 @@ const StyledAppLayout = styled.div`
   grid-template-columns: 26rem 1fr; /*첫번째 칼럼은 26rem, 나머지 칼럼은 나머지 영역 차지*/
   grid-template-rows: auto 1fr; /*첫번째 row는 컨텐츠 사이즈, 나머지 row는 나머지 영역 차지*/
   height: 100vh;
-
-  grid-row: 1 / -1;
 `
 
 const Main = styled.main`
