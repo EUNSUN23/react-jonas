@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import BookingDataBox from "../bookings/BookingDataBox.jsx";
 
-import Row from "../../ui/Row";
+import Row from "../../ui/Row.jsx";
 import Heading from "../../ui/Heading";
 import ButtonGroup from "../../ui/ButtonGroup.jsx";
 import Button from "../../ui/Button.jsx";
