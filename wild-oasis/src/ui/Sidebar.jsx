@@ -14,7 +14,6 @@ function Sidebar() {
         <StyledSidebar>
             <Logo/>
             <MainNav/>
-            sidebar
         </StyledSidebar>
     );
 }
