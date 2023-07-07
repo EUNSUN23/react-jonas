@@ -1,5 +1,9 @@
 import React from 'react';
 import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
+import {QueryClientProvider, QueryClient} from "@tanstack/react-query";
+import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
+
+import GlobalStyles from "./styles/GlobalStyles.js";
 import Dashboard from "./pages/Dashboard.jsx";
 import Bookings from "./pages/Bookings.jsx";
 import Cabins from "./pages/Cabins.jsx";
@@ -8,12 +12,23 @@ import Settings from "./pages/Settings.jsx";
 import Account from "./pages/Account.jsx";
 import Login from "./pages/Login.jsx";
 import PageNotFound from "./pages/PageNotFound.jsx";
-import GlobalStyles from "./styles/GlobalStyles.js";
 import AppLayout from "./ui/AppLayout.jsx";
+
+
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            // cached된 데이터가 유효한 시간(staleTime이 지나면 re-fetching됨)
+            staleTime: 60 * 1000, // 1분
+        }
+    }
+});
 
 function App() {
     return (
-        <>
+        <QueryClientProvider client={queryClient}>
+            <ReactQueryDevtools initialIsOpen={false}/>
             <GlobalStyles/>
             <BrowserRouter>
                 <Routes>
@@ -30,7 +45,7 @@ function App() {
                     <Route path='*' element={<PageNotFound/>}/>
                 </Routes>
             </BrowserRouter>
-        </>
+        </QueryClientProvider>
     );
 }
 
