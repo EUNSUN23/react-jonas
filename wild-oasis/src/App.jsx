@@ -13,7 +13,7 @@ import GlobalStyles from "./styles/GlobalStyles.js";
 function App() {
     return (
         <>
-        <GlobalStyles/>
+            <GlobalStyles/>
             <BrowserRouter>
                 <Routes>
                     <Route index element={<Navigate replace to='dashboard'/>}/>
