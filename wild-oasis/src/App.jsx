@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import GlobalStyles from "./styles/GlobalStyles.js";
 
 // 리액트 컴포넌트를 반환한다.
 // jsx props를 받을 수 있다.
@@ -33,12 +34,15 @@ const StyledApp = styled.main`
 
 function App() {
     return (
-        <StyledApp>
-            <H1>The wild oasis</H1>
-            <Button>Check in</Button>
-            <Button>Check out</Button>
-            <Input type='number' placeholder='Number of guests'/>
-        </StyledApp>
+        <>
+            <GlobalStyles/>
+            <StyledApp>
+                <H1>The wild oasis</H1>
+                <Button>Check in</Button>
+                <Button>Check out</Button>
+                <Input type='number' placeholder='Number of guests'/>
+            </StyledApp>
+        </>
     );
 }
 
