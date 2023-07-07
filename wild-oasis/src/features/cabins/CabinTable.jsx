@@ -1,4 +1,8 @@
 import styled from "styled-components";
+import {useQuery} from "@tanstack/react-query";
+import {getCabins} from "../../services/apiCabins.js";
+import Spinner from "../../ui/Spinner.jsx";
+import CabinRow from "./CabinRow.jsx";
 
 const Table = styled.div`
   border: 1px solid var(--color-grey-200);
@@ -23,3 +27,33 @@ const TableHeader = styled.header`
   color: var(--color-grey-600);
   padding: 1.6rem 2.4rem;
 `;
+
+
+function CabinTable() {
+    const {
+        isLoading,
+        data: cabins,
+        error
+    } = useQuery({
+        queryKey: ['cabin'], // data 식별자
+        queryFn: getCabins // query 함수. 항상 promise를 반환해야한다.
+    });
+
+    if(isLoading) return <Spinner/>;
+
+    return (
+        <Table role='table'> {/*웹접근성 위해 role추가 : table태그로 만든 테이블 아니기때문에.. */}
+            <TableHeader role='row'>
+                <div></div>
+                <div>Cabin</div>
+                <div>Capacity</div>
+                <div>Price</div>
+                <div>Discount</div>
+                <div></div>
+            </TableHeader>
+            {cabins.map(cabin => <CabinRow cabin={cabin} key={cabin.id}/>)}
+        </Table>
+    );
+}
+
+export default CabinTable;
