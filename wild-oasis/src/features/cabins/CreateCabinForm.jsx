@@ -38,7 +38,7 @@ function CreateCabinForm() {
 
     // data : register로 등록한 input의 data들
     function onSubmit(data) {
-        mutate(data);
+        mutate({...data, image: data.image[0]});
     }
 
     function onError(errors) {
@@ -107,8 +107,7 @@ function CreateCabinForm() {
 
             </FormRow>
 
-            <FormRow>
-                <Label htmlFor="image">Cabin photo</Label>
+            <FormRow label='Cabin photo' error={errors?.image?.message}>
                 <FileInput
                     id="image"
                     accept="image/*"
