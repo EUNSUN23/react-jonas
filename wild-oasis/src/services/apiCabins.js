@@ -13,14 +13,22 @@ export async function getCabins() {
     return data;
 }
 
-export async function createCabin(newCabin) {
+export async function createEditCabin(newCabin, id) {
+    const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl); // 이전 이미지 - true / 새 이미지 - false
+
     const imageName = `${Math.random()}-${newCabin.image.name}`.replaceAll("/", ""); // 특수문자 /에 대해서 supabase가 새로운 디렉토리를 생성하기 때문에 지워준다.
-    const imagePath = `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
-    // 1. Create cabin
-    const {data, error} = await supabase
-        .from('cabins')
-        .insert([{...newCabin, image: imagePath}])
-        .select(); // newCabin의 데이터 name과 db칼럼명이 같아야 이렇게 쓸 수 있음.
+    const imagePath = hasImagePath ? newCabin.image : `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
+
+    // 1. Create/edit cabin
+    let query = supabase.from('cabins');
+
+    // A) CREATE
+    if(!id) query = query.insert([{...newCabin, image: imagePath}])
+
+    // B) EDIT
+    if(id) query = query.update({...newCabin, image: imagePath}).eq('id', id)
+
+    const {data, error} = await query.select().single();
 
     if (error) {
         console.error(error);
@@ -37,12 +45,13 @@ export async function createCabin(newCabin) {
         await supabase
             .from('cabins')
             .delete()
-            .eq('id', data[0].id);
+            .eq('id', data.id);
 
         console.error(error);
         throw new Error('Cabin image could not be loaded and the cabin was not created');
     }
 
+    return data; // create/edit한 데이터 반환
 }
 
 export async function deleteCabin(id) {

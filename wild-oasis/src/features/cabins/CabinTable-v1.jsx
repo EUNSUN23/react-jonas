@@ -1,7 +1,8 @@
 import styled from "styled-components";
+import {useQuery} from "@tanstack/react-query";
+import {getCabins} from "../../services/apiCabins.js";
 import Spinner from "../../ui/Spinner.jsx";
 import CabinRow from "./CabinRow.jsx";
-import useCabins from "./useCabins.js";
 
 const Table = styled.div`
   border: 1px solid var(--color-grey-200);
@@ -29,7 +30,14 @@ const TableHeader = styled.header`
 
 
 function CabinTable() {
-    const {isLoading, cabins} = useCabins();
+    const {
+        isLoading,
+        data: cabins,
+        error
+    } = useQuery({
+        queryKey: ['cabins'], // data 식별자
+        queryFn: getCabins // query 함수. 항상 promise를 반환해야한다.
+    });
 
     if(isLoading) return <Spinner/>;
 
