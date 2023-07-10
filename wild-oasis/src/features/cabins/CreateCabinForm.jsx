@@ -48,7 +48,8 @@ const Error = styled.span`
 
 function CreateCabinForm() {
     // react-hook-form 라이브러리에서 제공하는 useForm hook 사용
-    const {register, handleSubmit, reset, getValues} = useForm();
+    const {register, handleSubmit, reset, getValues, formState} = useForm();
+    const {errors} = formState; // form validation 에러 객체
 
     const queryClient = useQueryClient();
 
@@ -85,6 +86,7 @@ function CreateCabinForm() {
                        {...register('name', {
                            required: 'This field is required'
                        })}/>
+                {errors?.name?.message && <Error>{errors.name.message}</Error>}
             </FormRow>
 
             <FormRow>
