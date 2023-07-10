@@ -6,6 +6,9 @@ import Button from "../../ui/Button.jsx";
 import FileInput from "../../ui/FileInput.jsx";
 import Textarea from "../../ui/Textarea.jsx";
 import {useForm} from "react-hook-form";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {createCabin} from "../../services/apiCabins.js";
+import toast from "react-hot-toast";
 
 const FormRow = styled.div`
   display: grid;
@@ -45,56 +48,72 @@ const Error = styled.span`
 
 function CreateCabinForm() {
     // react-hook-form 라이브러리에서 제공하는 useForm hook 사용
-    const {register, handleSubmit} = useForm();
+    const {register, handleSubmit, reset} = useForm();
+
+    const queryClient = useQueryClient();
+
+    const {mutate, isLoading:isCreating} = useMutation({
+        mutationFn: createCabin,
+        onSuccess: () => {
+            toast.success('New cabin successfully created');
+            queryClient.invalidateQueries({
+                queryKey: ['cabins']
+            });
+            reset(); // form reset
+        },
+        onError: err => toast.error(err.message)
+    });
+
     // * register : input을 form의 input으로 등록한다. {...register('input name')} --> onBlur, onChange 속성 생성.
 
     // handleSubmit함수가 인자로 받아 호출하는 함수
     // data : register로 등록한 input의 data들
-    function onSubmit(data){
-
+    function onSubmit(data) {
+        mutate(data);
     }
 
-  return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
-      <FormRow>
-        <Label htmlFor="name">Cabin name</Label>
-        <Input type="text" id="name" {...register('name')}/>
-      </FormRow>
 
-      <FormRow>
-        <Label htmlFor="maxCapacity">Maximum capacity</Label>
-        <Input type="number" id="maxCapacity" {...register('maxCapacity')}/>
-      </FormRow>
+    return (
+        <Form onSubmit={handleSubmit(onSubmit)}>
+            <FormRow>
+                <Label htmlFor="name">Cabin name</Label>
+                <Input type="text" id="name" {...register('name')}/>
+            </FormRow>
 
-      <FormRow>
-        <Label htmlFor="regularPrice">Regular price</Label>
-        <Input type="number" id="regularPrice" {...register('regularPrice')} />
-      </FormRow>
+            <FormRow>
+                <Label htmlFor="maxCapacity">Maximum capacity</Label>
+                <Input type="number" id="maxCapacity" {...register('maxCapacity')}/>
+            </FormRow>
 
-      <FormRow>
-        <Label htmlFor="discount">Discount</Label>
-        <Input type="number" id="discount" defaultValue={0} {...register('discount')}/>
-      </FormRow>
+            <FormRow>
+                <Label htmlFor="regularPrice">Regular price</Label>
+                <Input type="number" id="regularPrice" {...register('regularPrice')} />
+            </FormRow>
 
-      <FormRow>
-        <Label htmlFor="description">Description for website</Label>
-        <Textarea type="number" id="description" defaultValue="" {...register('description')}/>
-      </FormRow>
+            <FormRow>
+                <Label htmlFor="discount">Discount</Label>
+                <Input type="number" id="discount" defaultValue={0} {...register('discount')}/>
+            </FormRow>
 
-      <FormRow>
-        <Label htmlFor="image">Cabin photo</Label>
-        <FileInput id="image" accept="image/*" />
-      </FormRow>
+            <FormRow>
+                <Label htmlFor="description">Description for website</Label>
+                <Textarea type="number" id="description" defaultValue="" {...register('description')}/>
+            </FormRow>
 
-      <FormRow>
-        {/* type is an HTML attribute! -- reset버튼으로 동작(submit이 아니라) */}
-        <Button variation="secondary" type="reset">
-          Cancel
-        </Button>
-        <Button>Edit cabin</Button>
-      </FormRow>
-    </Form>
-  );
+            <FormRow>
+                <Label htmlFor="image">Cabin photo</Label>
+                <FileInput id="image" accept="image/*"/>
+            </FormRow>
+
+            <FormRow>
+                {/* type is an HTML attribute! -- reset버튼으로 동작(submit이 아니라) */}
+                <Button variation="secondary" type="reset">
+                    Cancel
+                </Button>
+                <Button disabled={isCreating}>Add cabin</Button>
+            </FormRow>
+        </Form>
+    );
 }
 
 export default CreateCabinForm;
