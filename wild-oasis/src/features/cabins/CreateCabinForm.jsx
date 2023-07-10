@@ -65,39 +65,44 @@ function CreateCabinForm() {
     });
 
     // * register : input을 form의 input으로 등록한다. {...register('input name')} --> onBlur, onChange 속성 생성.
+    // * handleSubmit : validation 성공(에러 x)하면 첫번째 오는 onSubmit함수를, validation 실패시(error) 두번째 인자인 onError함수를 실행한다.
 
-    // handleSubmit함수가 인자로 받아 호출하는 함수
     // data : register로 등록한 input의 data들
     function onSubmit(data) {
         mutate(data);
     }
 
+    function onError(errors) {
+
+    }
+
 
     return (
-        <Form onSubmit={handleSubmit(onSubmit)}>
+        <Form onSubmit={handleSubmit(onSubmit, onError)}>
             <FormRow>
                 <Label htmlFor="name">Cabin name</Label>
-                <Input type="text" id="name" {...register('name')}/>
+                <Input type="text" id="name" {...register('name',
+                    {required:'This field is required'})}/>
             </FormRow>
 
             <FormRow>
                 <Label htmlFor="maxCapacity">Maximum capacity</Label>
-                <Input type="number" id="maxCapacity" {...register('maxCapacity')}/>
+                <Input type="number" id="maxCapacity" {...register('maxCapacity',{required:'This field is required'})}/>
             </FormRow>
 
             <FormRow>
                 <Label htmlFor="regularPrice">Regular price</Label>
-                <Input type="number" id="regularPrice" {...register('regularPrice')} />
+                <Input type="number" id="regularPrice" {...register('regularPrice',{required:'This field is required'})} />
             </FormRow>
 
             <FormRow>
                 <Label htmlFor="discount">Discount</Label>
-                <Input type="number" id="discount" defaultValue={0} {...register('discount')}/>
+                <Input type="number" id="discount" defaultValue={0} {...register('discount',{required:'This field is required'})}/>
             </FormRow>
 
             <FormRow>
                 <Label htmlFor="description">Description for website</Label>
-                <Textarea type="number" id="description" defaultValue="" {...register('description')}/>
+                <Textarea type="number" id="description" defaultValue="" {...register('description',{required:'This field is required'})}/>
             </FormRow>
 
             <FormRow>
