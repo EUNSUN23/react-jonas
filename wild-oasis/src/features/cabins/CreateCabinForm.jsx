@@ -48,7 +48,7 @@ const Error = styled.span`
 
 function CreateCabinForm() {
     // react-hook-form 라이브러리에서 제공하는 useForm hook 사용
-    const {register, handleSubmit, reset} = useForm();
+    const {register, handleSubmit, reset, getValues} = useForm();
 
     const queryClient = useQueryClient();
 
@@ -117,13 +117,14 @@ function CreateCabinForm() {
                        defaultValue={0}
                        {...register('discount', {
                            required: 'This field is required',
+                           validate: (value) => value > getValues().regularPrice || 'Discount should be less than regular price'
                        })}/>
             </FormRow>
 
             <FormRow>
                 <Label htmlFor="description">Description for website</Label>
                 <Textarea type="number" id="description"
-                          defaultValue="" {...register('description', {required: 'This field is required'})}/>
+                          defaultValue="" {...register('description')}/>
             </FormRow>
 
             <FormRow>
