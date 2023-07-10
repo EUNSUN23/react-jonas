@@ -15,13 +15,23 @@ const Main = styled.main`
   padding: 4rem 4.8rem 6.4rem;
 `
 
+const Container = styled.div`
+  max-width: 120rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3.2rem;
+`
+
 function AppLayout() {
     return (
         <StyledAppLayout>
             <Header/>
             <Sidebar/>
             <Main> {/* 컨텐츠 영역 container */}
-                <Outlet/> {/* layout route의 child route컴포넌트 위치 */}
+                <Container>
+                    <Outlet/> {/* layout route의 child route컴포넌트 위치 */}
+                </Container>
             </Main>
         </StyledAppLayout>
     );
