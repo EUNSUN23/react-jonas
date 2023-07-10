@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import {formatCurrency} from "../../utils/helpers.js";
-import {useMutation} from "@tanstack/react-query";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {deleteCabin} from "../../services/apiCabins.js";
 
 const TableRow = styled.div`
@@ -45,9 +45,18 @@ const Discount = styled.div`
 function CabinRow({cabin}) {
     const {id: cabinId, name, maxCapacity, regularPrice, discount, image} = cabin;
 
+    const queryClient = useQueryClient();
+
     // 데이터 업데이트는 useMutation
     const {isLoading: isDeleting, mutate} = useMutation({
-        mutationFn: deleteCabin
+        mutationFn: deleteCabin,
+        onSuccess:() => {
+            alert('Cabin successfully deleted');
+            queryClient.invalidateQueries({ // 캐시데이터 invalidate함으로써 데이터 refetch하도록.
+                queryKey: ['cabins']
+            });
+        },
+        onError: err => alert(err.message),
     });
 
     return (

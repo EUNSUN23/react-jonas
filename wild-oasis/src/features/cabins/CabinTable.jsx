@@ -35,7 +35,7 @@ function CabinTable() {
         data: cabins,
         error
     } = useQuery({
-        queryKey: ['cabin'], // data 식별자
+        queryKey: ['cabins'], // data 식별자
         queryFn: getCabins // query 함수. 항상 promise를 반환해야한다.
     });
 
