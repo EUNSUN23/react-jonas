@@ -1,7 +1,4 @@
 import styled from "styled-components";
-import {HiXMark} from "react-icons/hi2";
-import {createPortal} from "react-dom";
-import {cloneElement, createContext, useContext, useState} from "react";
 
 const StyledModal = styled.div`
   position: fixed;
@@ -52,42 +49,20 @@ const Button = styled.button`
   }
 `;
 
+import {HiXMark} from "react-icons/hi2";
+import {createPortal} from "react-dom";
 
-
-const ModalContext = createContext();
-
-export default function Modal({children}) {
-    const [openName, setOpenName] = useState('');
-
-    const close = () => setOpenName('');
-    const open = setOpenName;
-
-    return (
-        <ModalContext.Provider value={{openName, close, open}}>
-             {children}
-         </ModalContext.Provider>
-    )
-
-}
-
-function Open({children, opens: opensWindowName}) {
-    const {open} = useContext(ModalContext);
-
-    // cloneElement : 요소를 복제해서 새로운 요소를 생성한다(새로운 prop추가 가능)
-    // return cloneElement(children, {onClick: () => open(opensWindowName)});
-    return cloneElement(children, {onClick: () => open(opensWindowName)});
-}
-
-function Window({children, name}) {
-    const {openName, close} = useContext(ModalContext);
-    if (name !== openName) return null;
-
+// * React portal - 돔tree 상에서의 요소 렌더링 위치를 컴포넌트 트리상의 컴포넌트의 위치와 다르게 하는 portal.
+// Modal에 portal을 쓰는 이유 :
+// overflow:hidden이 적용된 위치에 Modal을 사용하면 Modal이 cut-off 될 수 있는데,
+// 이런 경우를 대비해서 아예 Modal은 돔트리 최상단에 렌더링 되도록 하는 것이다.
+function ModalV1({children, onClose}) {
     return createPortal(
         <Overlay>
             <StyledModal>
-                <Button onClick={close}><HiXMark/></Button>
+                <Button onClick={onClose}><HiXMark/></Button>
                 <div>
-                    {cloneElement(children,{onCloseModal: close})}
+                    {children}
                 </div>
             </StyledModal>
         </Overlay>,
@@ -95,5 +70,4 @@ function Window({children, name}) {
     );
 }
 
-Modal.Open = Open;
-Modal.Window = Window;
+export default ModalV1;
