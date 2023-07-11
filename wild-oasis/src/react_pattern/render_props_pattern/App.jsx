@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { faker } from "@faker-js/faker";
+import {useState} from "react";
+import {faker} from "@faker-js/faker";
 import "./style.css";
 
-const products = Array.from({ length: 20 }, () => {
+const products = Array.from({length: 20}, () => {
     return {
         productName: faker.commerce.productName(),
         description: faker.commerce.productDescription(),
@@ -10,14 +10,14 @@ const products = Array.from({ length: 20 }, () => {
     };
 });
 
-const companies = Array.from({ length: 15 }, () => {
+const companies = Array.from({length: 15}, () => {
     return {
         companyName: faker.company.name(),
         phrase: faker.company.catchPhrase()
     };
 });
 
-function ProductItem({ product }) {
+function ProductItem({product}) {
     return (
         <li className="product">
             <p className="product-name">{product.productName}</p>
@@ -27,7 +27,7 @@ function ProductItem({ product }) {
     );
 }
 
-function CompanyItem({ company, defaultVisibility }) {
+function CompanyItem({company, defaultVisibility}) {
     const [isVisible, setIsVisisble] = useState(defaultVisibility);
 
     return (
@@ -46,7 +46,8 @@ function CompanyItem({ company, defaultVisibility }) {
     );
 }
 
-function List({ title, items }) {
+
+function List({title, items, render}) {
     const [isOpen, setIsOpen] = useState(true);
     const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -67,9 +68,7 @@ function List({ title, items }) {
             </div>
             {isOpen && (
                 <ul className="list">
-                    {displayItems.map((product) => (
-                        <ProductItem key={product.productName} product={product} />
-                    ))}
+                    {displayItems.map(render)}
                 </ul>
             )}
 
@@ -80,24 +79,37 @@ function List({ title, items }) {
     );
 }
 
+// * render-props 패턴 : render함수를 props로 받아서 하위컴포넌트를 렌더링하는 패턴. 요즘엔 custom hook덕에 거의 사용하지 않지만 필요할때가 있다.
+// * inversion of controll (List컴포넌트의 렌더링은 App에서 넘겨주는 render함수에 전적으로 의지함)
 export default function App() {
+
     return (
         <div>
             <h1>Render Props Demo</h1>
 
             <div className="col-2">
-                <List title="Products" items={products} />
+                <List title="Products"
+                      items={products}
+                      render={(product) => (
+                    <ProductItem key={product.productName} product={product}/>
+                )}/>
+
+                <List title="Companies"
+                      items={companies}
+                      render={(company) => (
+                          <CompanyItem key={company.companyName} company={company} defaultVisibility={false}/>
+                      )}/>
             </div>
         </div>
     );
 }
 
 // LATER: Let's say we got this component from a 3rd-party library, and can't change it. But we still want to add the 2 toggle functionalities to it
-function ProductList({ title, items }) {
+function ProductList({title, items}) {
     return (
         <ul className="list">
             {items.map((product) => (
-                <ProductItem key={product.productName} product={product} />
+                <ProductItem key={product.productName} product={product}/>
             ))}
         </ul>
     );
