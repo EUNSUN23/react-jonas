@@ -15,7 +15,7 @@ function useUpdateSetting() {
         onError:(err)=> toast.error(err.message)
     });
 
-    return {updateSetting,isUpdating};9854
+    return {updateSetting,isUpdating};
 
 
 }
