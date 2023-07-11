@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import {HiXMark} from "react-icons/hi2";
 import {createPortal} from "react-dom";
-import {cloneElement, createContext, useContext, useState} from "react";
+import {cloneElement, createContext, useContext, useEffect, useRef, useState} from "react";
 
 const StyledModal = styled.div`
   position: fixed;
@@ -53,7 +53,6 @@ const Button = styled.button`
 `;
 
 
-
 const ModalContext = createContext();
 
 export default function Modal({children}) {
@@ -64,8 +63,8 @@ export default function Modal({children}) {
 
     return (
         <ModalContext.Provider value={{openName, close, open}}>
-             {children}
-         </ModalContext.Provider>
+            {children}
+        </ModalContext.Provider>
     )
 
 }
@@ -80,14 +79,29 @@ function Open({children, opens: opensWindowName}) {
 
 function Window({children, name}) {
     const {openName, close} = useContext(ModalContext);
-    if (name !== openName) return null;
+    const ref = useRef();
 
+    // Modal 바깥영역 click 이벤트 감지 -> Modal close
+    useEffect(function () {
+        function handleClick(e) {
+            if (ref.current && !ref.current.contains(e.target)) close();
+        }
+
+        // 이벤트리스너 등록 - Add Cabin 버튼 클릭으로 버블링되는 이벤트는 감지하지 않고, 캡처링이벤트만 감지해서 처리하기 위해 option true로 설정.
+        document.addEventListener('click', handleClick, true);
+
+        // 이벤트 리스너 제거
+        return () => document.removeEventListener('click', handleClick);
+
+    }, [close]);
+
+    if (name !== openName) return null;
     return createPortal(
         <Overlay>
-            <StyledModal>
+            <StyledModal ref={ref}>
                 <Button onClick={close}><HiXMark/></Button>
                 <div>
-                    {cloneElement(children,{onCloseModal: close})}
+                    {cloneElement(children, {onCloseModal: close})}
                 </div>
             </StyledModal>
         </Overlay>,
