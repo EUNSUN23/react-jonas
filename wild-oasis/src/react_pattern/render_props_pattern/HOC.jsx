@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+// * HOC를 어떻게 사용하는지는 몰라도 되지만 뭔지는 알아두면 좋다.
+// 컴포넌트를 PROPS로 받아서 새 컴포넌트를 반환한다.
 export default function withToggles(WrappedComponent) {
     return function List(props) {
         const [isOpen, setIsOpen] = useState(true);
