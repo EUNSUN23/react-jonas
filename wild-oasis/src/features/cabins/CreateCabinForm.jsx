@@ -8,9 +8,11 @@ import FormRow from "../../ui/FormRow.jsx";
 import {useForm} from "react-hook-form";
 import useCreateCabin from "./useCreateCabin.js";
 import useEditCabin from "./useEditCabin.js";
+import {createContext} from "react";
 
 
-function CreateCabinForm({cabinToEdit = {}}) {
+
+function CreateCabinForm({cabinToEdit = {}, onCloseModal}) {
     const {createCabin, isCreating} = useCreateCabin();
     const {editCabin, isEditing} = useEditCabin();
     const isWorking = isCreating || isEditing;
@@ -25,12 +27,6 @@ function CreateCabinForm({cabinToEdit = {}}) {
 
     const {errors} = formState; // form validation 에러 객체
 
-
-
-
-
-
-
     // data : register로 등록한 input의 data들
     function onSubmit(data) {
         const image = typeof data.image === 'string' ? data.image : data.image[0];
@@ -42,17 +38,17 @@ function CreateCabinForm({cabinToEdit = {}}) {
                 onSuccess: (data) => {
                     // data : mutate함수(여기선 createCabin)이 반환한 값을 인자로 받는다.
                     reset();
+                    onCloseModal?.();
                 }
             });
     }
 
-    function onError(errors) {
+    function onError() {
 
     }
 
-
     return (
-        <Form onSubmit={handleSubmit(onSubmit, onError)}>
+        <Form onSubmit={handleSubmit(onSubmit, onError)} type={onCloseModal ? 'modal':'regular'}>
             <FormRow label='Cabin name' error={errors?.name?.message}>
                 <Input type="text"
                        id="name"
@@ -124,7 +120,7 @@ function CreateCabinForm({cabinToEdit = {}}) {
 
             <FormRow>
                 {/* type is an HTML attribute! -- reset버튼으로 동작(submit이 아니라) */}
-                <Button variation="secondary" type="reset">
+                <Button variation="secondary" type="reset" onClick={() => onCloseModal?.()}>
                     Cancel
                 </Button>
                 <Button disabled={isWorking}>{isEditSession ? 'Edit cabin' : 'Create new cabin'}</Button>
