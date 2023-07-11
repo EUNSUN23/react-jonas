@@ -49,11 +49,15 @@ const Button = styled.button`
   }
 `;
 
-import React from 'react';
 import {HiXMark} from "react-icons/hi2";
+import {createPortal} from "react-dom";
 
+// * React portal - 돔tree 상에서의 요소 렌더링 위치를 컴포넌트 트리상의 컴포넌트의 위치와 다르게 하는 portal.
+// Modal에 portal을 쓰는 이유 :
+// overflow:hidden이 적용된 위치에 Modal을 사용하면 Modal이 cut-off 될 수 있는데,
+// 이런 경우를 대비해서 아예 Modal은 돔트리 최상단에 렌더링 되도록 하는 것이다.
 function Modal({children, onClose}) {
-    return (
+    return createPortal(
         <Overlay>
             <StyledModal>
                 <Button onClick={onClose}><HiXMark/></Button>
@@ -61,7 +65,8 @@ function Modal({children, onClose}) {
                     {children}
                 </div>
             </StyledModal>
-        </Overlay>
+        </Overlay>,
+        document.body // jsx를 렌더링할 돔요소 -> 돔트리상에서 body의 direct child가 된다(react의 root요소 바깥에 위치하게 됨)
     );
 }
 
