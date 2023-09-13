@@ -129,3 +129,131 @@ export function usePosts() {
 }
 
 ```
+
+# Context API + useReducer 상태 관리
+<hr/>
+
+👉 Context API 자체는 value객체를 전역적으로 컴포넌트들에 전달할 뿐, state 관리 기능은 없다. <br/>따라서 state 관리를 위해서 보통 useState, useReducer를 같이 사용한다. 
+
+### 1. initialState & reducer 생성
+```js
+// reactrouter_worldwise/vite-project/context/CitiesContext.jsx 
+import {createContext, useCallback, useContext, useEffect, useReducer} from "react";
+
+const BASE_URL = 'http://localhost:8000';
+
+const CitiesContext = createContext();
+
+const initialState = {
+  cities: [],
+  isLoading: false,
+  currentCity: {},
+  error: ""
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'loading':
+      return {...state, isLoading: true};
+    case 'city/loaded':
+      return {...state, isLoading: false, currentCity: action.payload};
+    case 'cities/loaded':
+      return {...state, isLoading: false, cities: action.payload};
+    case 'city/created':
+      return {...state, isLoading: false, currentCity: action.payload, cities: [...state.cities, action.payload]};
+    case 'city/deleted':
+      return {...state, isLoading: false, cities: state.cities.filter(city => city.id !== action.payload)};
+    case 'rejected':
+      return {...state, isLoading: false, error: action.payload};
+    default:
+      throw new Error("Unknown action type");
+  }
+}
+
+
+```
+
+- #### reducer함수안에는 가능한 많은 비즈니스 로직을 수행햐게 해야하지만 순수함수여야 한다.
+   - 순수함수 : 같은 파라미터에 대해서는 항상 같은 결과를 반환한다. (ex: HTTP통신 등 x)
+- #### dispatch action type명은 '이벤트' 중심으로 한다. (ex: setCities -> 'cities/loaded')
+
+<br/>
+
+### 2. useReducer로 useState 대체 
+```js
+// reactrouter_worldwise/vite-project/context/CitiesContext.jsx
+export function CitiesProvider({children}) {
+  const [{cities, isLoading, currentCity, error}, dispatch] = useReducer(reducer, initialState);
+
+  useEffect(() => {
+    async function fetchCities() {
+      try {
+        dispatch({type: 'loading'});
+        const res = await fetch(`${BASE_URL}/cities`);
+        const data = await res.json();
+        dispatch({type: 'cities/loaded', payload: data});
+      } catch (e) {
+        dispatch({type: 'rejected', payload: "There was an error loading cities..."});
+      }
+    }
+
+    fetchCities();
+  }, []);
+
+  const getCity = useCallback(async function getCity(id) {
+    if(Number(id) === currentCity.id) return;
+    try {
+      dispatch({type: 'loading'});
+      const res = await fetch(`${BASE_URL}/cities/${id}`);
+      const data = await res.json();
+      dispatch({type: 'city/loaded', payload: data});
+    } catch (e) {
+      dispatch({type: 'rejected', payload: "There was an error loading city..."});
+    }
+  },[currentCity.id]);
+
+  async function createCity(newCity) {
+    try {
+      dispatch({type: 'loading'});
+      const res = await fetch(`${BASE_URL}/cities/`, {
+        method: 'POST',
+        body: JSON.stringify(newCity),
+        headers: {'Content-Type': 'application/json'}
+      });
+      const data = await res.json();
+      dispatch({type: 'city/created', payload: data});
+    } catch (e) {
+      dispatch({type: 'rejected', payload: "There was an error creating city..."});
+    }
+  }
+
+  async function deleteCity(id) {
+    try {
+      dispatch({type: 'loading'});
+      await fetch(`${BASE_URL}/cities/${id}`, {
+        method: 'DELETE'
+      });
+      dispatch({type: 'city/deleted', payload: id});
+    } catch (e) {
+      dispatch({type: 'rejected', payload: "There was an error deleting city..."});
+    }
+  }
+
+  return (
+          <CitiesContext.Provider value={{
+            cities,
+            isLoading,
+            currentCity,
+            getCity,
+            createCity,
+            deleteCity,
+            error
+          }}>
+            {children}
+          </CitiesContext.Provider>
+  )
+}
+```
+
+- **reducer함수 안에서는 순수하게 비즈니스 로직만 포함되도록, 초기 데이터는 useEffect로 fetch해서 dispatch로 넘긴다.**
+- getCity, createCity, deleteCity : dispatch 사용하는 상태관리 메서드들. 전역에서 사용 가능하도록 context value에 넘긴다. 
