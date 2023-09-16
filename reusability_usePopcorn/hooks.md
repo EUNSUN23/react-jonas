@@ -135,5 +135,51 @@ useEffect(fnz, []);
 - mutable 하다
 - update를 동기적으로 수행한다 (업데이트 직후에 바뀐 값 사용 가능)
 
+## React.forwardRef 
+<hr/>
 
 
+> 💡 **ref의 값은 노드의 유형에 따라 다르다.** 
+>  - ref 어트리뷰트가 HTML 엘리먼트에 쓰였다면, 생성자에서 React.createRef()로 생성된 ref는 자신을 전달받은 DOM 엘리먼트를 current 프로퍼티의 
+> 값으로 받는다. 
+>  - ref 어트리뷰트가 커스텀 클래스 컴포넌트에 쓰였따면, ref 객체는 마운트된 컴포넌트의 인스턴스를 current프로퍼티의 값으로서 받는다.
+>  - **함수 컴포넌트는 인스턴스가 없기 때문에 함수 컴포넌트에는 ref 어트리뷰트를 사용할 수 없다.**
+
+<br/>
+
+### 함수 컴포넌트를 ref로 제어하기 위해서는 forwardRef함수로 해당 컴포넌트를 감싸야 한다. 
+#### 👉 ex: 부모 컴포넌트에서 함수컴포넌트를 ref로 제어해서 포커스 등을 할 때 
+   ```js
+import { forwardRef } from 'react';
+
+const MyInput = forwardRef(function MyInput(props, ref) {
+    const { label, ...otherProps } = props;
+    
+    return (
+      <label>
+        {label}
+        <input {...otherProps} ref={ref} />
+      </label>
+    );
+});
+```
+
+```js
+function Form() {
+  const ref = useRef(null);
+
+  function handleClick() {
+    ref.current.focus();
+  }
+
+  return (
+    <form>
+      <MyInput label="Enter your name:" ref={ref} />
+      <button type="button" onClick={handleClick}>
+        Edit
+      </button>
+    </form>
+  );
+}
+```
+출처: https://react.dev/reference/react/forwardRef
